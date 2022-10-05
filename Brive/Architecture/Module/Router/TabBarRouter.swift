@@ -19,6 +19,7 @@ open class TabBarRouter<Module, Builder: Buildable>: DefaultRouter, ParentRoutab
     /// The builder that builds child modules.
     let builder: Builder
     
+    
     // MARK: - Public Methods
     
     /// Routes to the given module.

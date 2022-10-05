@@ -95,7 +95,6 @@
 			children = (
 				0C494F3328EDB0F600A0E325 /* RootRoutable.swift */,
 				0C494F5A28EE13F000A0E325 /* Router */,
-				0C494F2E28EDB0F600A0E325 /* Router1 */,
 				0C494F2A28EDB0F600A0E325 /* Interactor */,
 				0C494F2828EDB0F600A0E325 /* View */,
 			);
@@ -118,13 +117,6 @@
 				0C494F2D28EDB0F600A0E325 /* RouterInteracting.swift */,
 			);
 			path = Interactor;
-			sourceTree = "<group>";
-		};
-		0C494F2E28EDB0F600A0E325 /* Router1 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Router1;
 			sourceTree = "<group>";
 		};
 		0C494F3928EDB0F600A0E325 /* Builder */ = {
