@@ -8,11 +8,41 @@
 
 /* Begin PBXBuildFile section */
 		0C494F2028EDB08900A0E325 /* Brive.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C494F1F28EDB08900A0E325 /* Brive.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0C494F3C28EDB0F600A0E325 /* Viewable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F2928EDB0F600A0E325 /* Viewable.swift */; };
+		0C494F3D28EDB0F600A0E325 /* Interactable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F2B28EDB0F600A0E325 /* Interactable.swift */; };
+		0C494F3E28EDB0F600A0E325 /* ControlInteractable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F2C28EDB0F600A0E325 /* ControlInteractable.swift */; };
+		0C494F3F28EDB0F600A0E325 /* RouterInteracting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F2D28EDB0F600A0E325 /* RouterInteracting.swift */; };
+		0C494F4028EDB0F600A0E325 /* TabBarRoutable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F2F28EDB0F600A0E325 /* TabBarRoutable.swift */; };
+		0C494F4128EDB0F600A0E325 /* ChildRoutable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3028EDB0F600A0E325 /* ChildRoutable.swift */; };
+		0C494F4228EDB0F600A0E325 /* ParentRoutable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3128EDB0F600A0E325 /* ParentRoutable.swift */; };
+		0C494F4328EDB0F600A0E325 /* Routable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3228EDB0F600A0E325 /* Routable.swift */; };
+		0C494F4428EDB0F600A0E325 /* RootRoutable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3328EDB0F600A0E325 /* RootRoutable.swift */; };
+		0C494F4528EDB0F600A0E325 /* Routing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3428EDB0F600A0E325 /* Routing.swift */; };
+		0C494F4628EDB0F600A0E325 /* NavigationRoutable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3528EDB0F600A0E325 /* NavigationRoutable.swift */; };
+		0C494F4728EDB0F600A0E325 /* Controlling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3728EDB0F600A0E325 /* Controlling.swift */; };
+		0C494F4828EDB0F600A0E325 /* Eventing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3828EDB0F600A0E325 /* Eventing.swift */; };
+		0C494F4928EDB0F600A0E325 /* AppBuildable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3A28EDB0F600A0E325 /* AppBuildable.swift */; };
+		0C494F4A28EDB0F600A0E325 /* Buildable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F3B28EDB0F600A0E325 /* Buildable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0C494F1C28EDB08900A0E325 /* Brive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Brive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C494F1F28EDB08900A0E325 /* Brive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Brive.h; sourceTree = "<group>"; };
+		0C494F2928EDB0F600A0E325 /* Viewable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Viewable.swift; sourceTree = "<group>"; };
+		0C494F2B28EDB0F600A0E325 /* Interactable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interactable.swift; sourceTree = "<group>"; };
+		0C494F2C28EDB0F600A0E325 /* ControlInteractable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlInteractable.swift; sourceTree = "<group>"; };
+		0C494F2D28EDB0F600A0E325 /* RouterInteracting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RouterInteracting.swift; sourceTree = "<group>"; };
+		0C494F2F28EDB0F600A0E325 /* TabBarRoutable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarRoutable.swift; sourceTree = "<group>"; };
+		0C494F3028EDB0F600A0E325 /* ChildRoutable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChildRoutable.swift; sourceTree = "<group>"; };
+		0C494F3128EDB0F600A0E325 /* ParentRoutable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParentRoutable.swift; sourceTree = "<group>"; };
+		0C494F3228EDB0F600A0E325 /* Routable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Routable.swift; sourceTree = "<group>"; };
+		0C494F3328EDB0F600A0E325 /* RootRoutable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootRoutable.swift; sourceTree = "<group>"; };
+		0C494F3428EDB0F600A0E325 /* Routing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Routing.swift; sourceTree = "<group>"; };
+		0C494F3528EDB0F600A0E325 /* NavigationRoutable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationRoutable.swift; sourceTree = "<group>"; };
+		0C494F3728EDB0F600A0E325 /* Controlling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Controlling.swift; sourceTree = "<group>"; };
+		0C494F3828EDB0F600A0E325 /* Eventing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Eventing.swift; sourceTree = "<group>"; };
+		0C494F3A28EDB0F600A0E325 /* AppBuildable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppBuildable.swift; sourceTree = "<group>"; };
+		0C494F3B28EDB0F600A0E325 /* Buildable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buildable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,8 +76,79 @@
 			isa = PBXGroup;
 			children = (
 				0C494F1F28EDB08900A0E325 /* Brive.h */,
+				0C494F2628EDB0F600A0E325 /* Architecture */,
 			);
 			path = Brive;
+			sourceTree = "<group>";
+		};
+		0C494F2628EDB0F600A0E325 /* Architecture */ = {
+			isa = PBXGroup;
+			children = (
+				0C494F3928EDB0F600A0E325 /* Builder */,
+				0C494F2728EDB0F600A0E325 /* Module */,
+				0C494F3628EDB0F600A0E325 /* Other */,
+			);
+			path = Architecture;
+			sourceTree = "<group>";
+		};
+		0C494F2728EDB0F600A0E325 /* Module */ = {
+			isa = PBXGroup;
+			children = (
+				0C494F2E28EDB0F600A0E325 /* Router */,
+				0C494F2A28EDB0F600A0E325 /* Interactor */,
+				0C494F2828EDB0F600A0E325 /* View */,
+			);
+			path = Module;
+			sourceTree = "<group>";
+		};
+		0C494F2828EDB0F600A0E325 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				0C494F2928EDB0F600A0E325 /* Viewable.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		0C494F2A28EDB0F600A0E325 /* Interactor */ = {
+			isa = PBXGroup;
+			children = (
+				0C494F2B28EDB0F600A0E325 /* Interactable.swift */,
+				0C494F2C28EDB0F600A0E325 /* ControlInteractable.swift */,
+				0C494F2D28EDB0F600A0E325 /* RouterInteracting.swift */,
+			);
+			path = Interactor;
+			sourceTree = "<group>";
+		};
+		0C494F2E28EDB0F600A0E325 /* Router */ = {
+			isa = PBXGroup;
+			children = (
+				0C494F3328EDB0F600A0E325 /* RootRoutable.swift */,
+				0C494F2F28EDB0F600A0E325 /* TabBarRoutable.swift */,
+				0C494F3528EDB0F600A0E325 /* NavigationRoutable.swift */,
+				0C494F3128EDB0F600A0E325 /* ParentRoutable.swift */,
+				0C494F3028EDB0F600A0E325 /* ChildRoutable.swift */,
+				0C494F3228EDB0F600A0E325 /* Routable.swift */,
+				0C494F3428EDB0F600A0E325 /* Routing.swift */,
+			);
+			path = Router;
+			sourceTree = "<group>";
+		};
+		0C494F3628EDB0F600A0E325 /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				0C494F3728EDB0F600A0E325 /* Controlling.swift */,
+				0C494F3828EDB0F600A0E325 /* Eventing.swift */,
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
+		0C494F3928EDB0F600A0E325 /* Builder */ = {
+			isa = PBXGroup;
+			children = (
+				0C494F3A28EDB0F600A0E325 /* AppBuildable.swift */,
+				0C494F3B28EDB0F600A0E325 /* Buildable.swift */,
+			);
+			path = Builder;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -129,6 +230,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C494F4528EDB0F600A0E325 /* Routing.swift in Sources */,
+				0C494F4128EDB0F600A0E325 /* ChildRoutable.swift in Sources */,
+				0C494F4428EDB0F600A0E325 /* RootRoutable.swift in Sources */,
+				0C494F4A28EDB0F600A0E325 /* Buildable.swift in Sources */,
+				0C494F3E28EDB0F600A0E325 /* ControlInteractable.swift in Sources */,
+				0C494F4028EDB0F600A0E325 /* TabBarRoutable.swift in Sources */,
+				0C494F3C28EDB0F600A0E325 /* Viewable.swift in Sources */,
+				0C494F3D28EDB0F600A0E325 /* Interactable.swift in Sources */,
+				0C494F4628EDB0F600A0E325 /* NavigationRoutable.swift in Sources */,
+				0C494F4928EDB0F600A0E325 /* AppBuildable.swift in Sources */,
+				0C494F3F28EDB0F600A0E325 /* RouterInteracting.swift in Sources */,
+				0C494F4228EDB0F600A0E325 /* ParentRoutable.swift in Sources */,
+				0C494F4328EDB0F600A0E325 /* Routable.swift in Sources */,
+				0C494F4828EDB0F600A0E325 /* Eventing.swift in Sources */,
+				0C494F4728EDB0F600A0E325 /* Controlling.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
