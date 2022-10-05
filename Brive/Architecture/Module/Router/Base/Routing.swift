@@ -3,9 +3,9 @@ public protocol Routing: AnyObject {
     
     /// Modules that each parent router can run.
     /// To implement this, use `Enumeration`.
-    associatedtype ChildModule
+    associatedtype Module: Hashable
     
     /// Routes to the given module.
-    func route(to module: ChildModule) -> Void
+    func route(to module: Module) -> Void
     
 }

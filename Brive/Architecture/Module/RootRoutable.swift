@@ -1,7 +1,7 @@
 import UIKit
 
 /// A type that the root router should conform to.
-public protocol RootRoutable: Routable, Controlling {
+public protocol Launching: AnyObject {
     
     /// Launches the router from the given window.
     func launch(from window: UIWindow) -> Void
@@ -9,12 +9,12 @@ public protocol RootRoutable: Routable, Controlling {
 }
 
 
-public extension RootRoutable {
+public extension Launching {
     
     func launch(from window: UIWindow) -> Void {
-        window.rootViewController = controller
-        window.makeKeyAndVisible()
-        activate()
+//        window.rootViewController = controller
+//        window.makeKeyAndVisible()
+//        activate()
     }
     
 }
