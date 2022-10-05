@@ -1,7 +1,7 @@
 import UIKit
 
 /// The tab bar router that owns child routers.
-open class TabBarRouter<Module, Builder: Buildable>: DefaultRouter, ParentRoutable, TabBarControllable where Builder.Module == Module {
+open class TabBarRouter<Module, Builder: Buildable>: DefaultRouter, ParentRoutable, TabBarControllable, Routing where Builder.Module == Module {
     
     // MARK: - Properties
     
@@ -10,7 +10,7 @@ open class TabBarRouter<Module, Builder: Buildable>: DefaultRouter, ParentRoutab
     public final var controller = UITabBarController()
     
     /// The tab bar to display.
-    /// - Important: Before activation, It must contain all modules.
+    /// - Important: Before activation, It must contain all child modules.
     public final var tabBar = [Module]()
     
     /// The list of child routers.
@@ -19,8 +19,16 @@ open class TabBarRouter<Module, Builder: Buildable>: DefaultRouter, ParentRoutab
     /// The builder that builds child modules.
     let builder: Builder
     
+    // MARK: - Public Methods
     
-    // MARK: - Internal Methods
+    /// Routes to the given module.
+    public final func route(to module: Module) -> Void {
+        guard let index = tabBar.firstIndex(of: module) else { return }
+        controller.selectedIndex = index
+    }
+    
+    
+    // MARK: Internal Methods
     
     /// Activates this router.
     override func activate() -> Void {
