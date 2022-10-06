@@ -8,6 +8,6 @@ public protocol Buildable: AnyObject {
     
     /// Builds the given module.
     /// - Returns: The router of this module and the view to display.
-    func build(module: Module) -> (DefaultRouter, UIViewController?)
+    func build(_ module: Module) -> (DefaultRouter, UIViewController?)
     
 }

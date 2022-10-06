@@ -4,7 +4,7 @@ import UIKit
 public protocol AppBuildable: AnyObject {
     
     /// The root router of this module.
-    associatedtype RootRouter: RootRoutable
+    associatedtype RootRouter: Launchable
     
     /// Builds the root module.
     /// - Returns: The root router of this module and the view to display.
