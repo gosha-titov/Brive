@@ -18,6 +18,9 @@ open class DefaultRouter {
     /// You should never change this property.
     public final var parent: DefaultRouter?
     
+    /// The view that will be displayed.
+    var view: UIViewController?
+    
     
     // MARK: - Open Methods
     
@@ -71,6 +74,7 @@ open class DefaultRouter {
         routerIsDeactivating()
         interactor.deactivate()
         parent = nil
+        view = nil
     }
     
     

@@ -1,5 +1,6 @@
 import UIKit
 
+/// A type that all builders should conform to.
 public protocol Buildable: AnyObject {
     
     /// Modules that each parent router can run.

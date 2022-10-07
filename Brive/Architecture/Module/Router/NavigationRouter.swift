@@ -26,7 +26,10 @@ open class NavigationRouter<Module, Builder: Buildable>: ParentRouter<Module, Bu
     ///
     /// Add сhild modules here if you want them to be activated when this module does.
     /// These modules are not shown until it is needed.
-    public final var modulesThatMustBeActivatedInAdvance = [Module]()
+    /// The duplicate modules will be removed.
+    public final var activatedModulesInAdvance = [Module]() {
+        didSet { activatedModulesInAdvance.removeDuplicates() }
+    }
     
     
     // MARK: - Public Methods
@@ -42,15 +45,15 @@ open class NavigationRouter<Module, Builder: Buildable>: ParentRouter<Module, Bu
     public final func route(to module: Module, with input: Input? = nil) -> Void {
         
         guard let rootController = rootController else { return }
-        if !children.hasKey(module) { create(module) }
+        if !children.hasKey(module) { build(module) }
         
-        guard let (child, view) = children[module] else { return }
+        guard let child = children[module] else { return }
         input.executeSafely { child.receive($0) }
         
         if let child = child as? TabBarControllable {
             rootController.pushViewController(child.rootController)
         } else {
-            view.executeSafely { rootController.pushViewController($0) }
+            child.view.executeSafely { rootController.pushViewController($0) }
         }
         
     }
@@ -59,7 +62,7 @@ open class NavigationRouter<Module, Builder: Buildable>: ParentRouter<Module, Bu
     // MARK: Internal Methods
     
     override func routerIsActivating() {
-        modulesThatMustBeActivatedInAdvance.forEach { create($0) }
+        activatedModulesInAdvance.forEach { build($0) }
     }
     
     override func routerIsDeactivating() -> Void {
@@ -67,10 +70,11 @@ open class NavigationRouter<Module, Builder: Buildable>: ParentRouter<Module, Bu
         rootController = nil
     }
     
-    /// Creates the given module.
-    func create(_ module: Module) -> Void {
+    /// Builds the given module.
+    func build(_ module: Module) -> Void {
         let (child, view) = builder.build(module)
-        attach(child, with: view, to: module)
+        attach(child, to: module)
+        child.view = view
         if let child = child as? NavigationControllable {
             child.rootController = rootController
         }

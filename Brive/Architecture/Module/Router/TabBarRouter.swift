@@ -43,7 +43,7 @@ open class TabBarRouter<Module, Builder: Buildable>: ParentRouter<Module, Builde
     ///
     public final func route(to module: Module, with input: Input? = nil) -> Void {
         guard let index = tabBar.firstIndex(of: module) else { return }
-        if let (child, _) = children[module] {
+        if let child = children[module] {
             input.executeSafely { child.receive($0) }
         }
         rootController.selectedIndex = index
@@ -56,7 +56,8 @@ open class TabBarRouter<Module, Builder: Buildable>: ParentRouter<Module, Builde
         var views = [UIViewController]()
         for module in tabBar {
             let (child, view) = builder.build(module)
-            attach(child, with: view, to: module)
+            attach(child, to: module)
+            child.view = view
             if let child = child as? NavigationControllable {
                 let controller = UINavigationController()
                 child.rootController = controller

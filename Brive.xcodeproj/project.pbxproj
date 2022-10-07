@@ -144,6 +144,8 @@
 				0C494F6628EE2F5300A0E325 /* TabBarRouter.swift */,
 				0C494F7628EF1AF000A0E325 /* NavigationRouter.swift */,
 				0C494F6128EE2AB300A0E325 /* DefaultRouter.swift */,
+				0C494F3328EDB0F600A0E325 /* Launchable.swift */,
+				0C494F3428EDB0F600A0E325 /* Routing.swift */,
 				0C494F6528EE2E4E00A0E325 /* Base */,
 			);
 			path = Router;
@@ -153,9 +155,7 @@
 			isa = PBXGroup;
 			children = (
 				0C494F7428EF16BC00A0E325 /* ParentRouter.swift */,
-				0C494F3328EDB0F600A0E325 /* Launchable.swift */,
 				0C494F7828EF221800A0E325 /* Controllable.swift */,
-				0C494F3428EDB0F600A0E325 /* Routing.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
