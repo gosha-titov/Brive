@@ -4,10 +4,13 @@ import UIKit
 /// The base router for tab bar and navigation routers.
 open class ParentRouter<Module, Builder: Buildable>: DefaultRouter where Builder.Module == Module {
     
+    typealias View = UIViewController?
+    
+    
     // MARK: - Internal Properties
     
-    /// The list of child routers.
-    var children = [Module: DefaultRouter]()
+    /// The dictionary of routers that are children of the current router.
+    var children = [Module: (DefaultRouter, View)]()
     
     /// The builder that builds child modules.
     let builder: Builder
@@ -16,22 +19,22 @@ open class ParentRouter<Module, Builder: Buildable>: DefaultRouter where Builder
     // MARK: - Internal Methods
     
     /// Attaches the given router to the module.
-    func attach(_ child: DefaultRouter, to module: Module) -> Void {
-        children[module] = child
+    func attach(_ child: DefaultRouter, with view: View, to module: Module) -> Void {
+        children[module] = (child, view)
         child.parent = self
         child.activate()
     }
     
     /// Detaches the child router from the module.
     func detachChild(from module: Module) -> Void {
-        guard let child = children[module] else { return }
+        guard let (child, _) = children[module] else { return }
         children.removeValue(forKey: module)
         child.deactivate()
     }
     
     /// Detaches all child routers.
     func detachAllChildren() -> Void {
-        children.values.forEach { $0.deactivate() }
+        children.values.forEach { $0.0.deactivate() }
         children.removeAll()
     }
     

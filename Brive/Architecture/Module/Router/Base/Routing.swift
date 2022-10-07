@@ -5,7 +5,10 @@ public protocol Routing: AnyObject {
     /// To implement this, use `Enumeration`.
     associatedtype Module: Hashable
     
+    /// The input
+    associatedtype Input
+    
     /// Routes to the given module.
-    func route(to module: Module) -> Void
+    func route(to module: Module, with input: Input?) -> Void
     
 }
