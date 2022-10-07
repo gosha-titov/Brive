@@ -22,6 +22,8 @@
 		0C494F7528EF16BC00A0E325 /* ParentRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F7428EF16BC00A0E325 /* ParentRouter.swift */; };
 		0C494F7728EF1AF000A0E325 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F7628EF1AF000A0E325 /* NavigationRouter.swift */; };
 		0C494F7928EF221800A0E325 /* Controllable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F7828EF221800A0E325 /* Controllable.swift */; };
+		0C55D32428F0756F0039D4B5 /* Viewing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C55D32328F0756F0039D4B5 /* Viewing.swift */; };
+		0C55D32628F0768D0039D4B5 /* ViewInteracting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C55D32528F0768D0039D4B5 /* ViewInteracting.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,8 @@
 		0C494F7428EF16BC00A0E325 /* ParentRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentRouter.swift; sourceTree = "<group>"; };
 		0C494F7628EF1AF000A0E325 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
 		0C494F7828EF221800A0E325 /* Controllable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controllable.swift; sourceTree = "<group>"; };
+		0C55D32328F0756F0039D4B5 /* Viewing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Viewing.swift; sourceTree = "<group>"; };
+		0C55D32528F0768D0039D4B5 /* ViewInteracting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewInteracting.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				0C494F2928EDB0F600A0E325 /* Viewable.swift */,
+				0C55D32328F0756F0039D4B5 /* Viewing.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -124,7 +129,7 @@
 			children = (
 				0C494F2B28EDB0F600A0E325 /* Interactable.swift */,
 				0C494F2C28EDB0F600A0E325 /* ControlInteractable.swift */,
-				0C494F2D28EDB0F600A0E325 /* RouterInteracting.swift */,
+				0C55D32728F076E80039D4B5 /* Interfaces */,
 			);
 			path = Interactor;
 			sourceTree = "<group>";
@@ -173,6 +178,15 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		0C55D32728F076E80039D4B5 /* Interfaces */ = {
+			isa = PBXGroup;
+			children = (
+				0C494F2D28EDB0F600A0E325 /* RouterInteracting.swift */,
+				0C55D32528F0768D0039D4B5 /* ViewInteracting.swift */,
+			);
+			path = Interfaces;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -271,9 +285,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C494F7728EF1AF000A0E325 /* NavigationRouter.swift in Sources */,
+				0C55D32428F0756F0039D4B5 /* Viewing.swift in Sources */,
 				0C494F4528EDB0F600A0E325 /* Routing.swift in Sources */,
 				0C494F4428EDB0F600A0E325 /* Launchable.swift in Sources */,
 				0C494F4A28EDB0F600A0E325 /* Buildable.swift in Sources */,
+				0C55D32628F0768D0039D4B5 /* ViewInteracting.swift in Sources */,
 				0C494F6228EE2AB300A0E325 /* DefaultRouter.swift in Sources */,
 				0C494F7928EF221800A0E325 /* Controllable.swift in Sources */,
 				0C494F3E28EDB0F600A0E325 /* ControlInteractable.swift in Sources */,

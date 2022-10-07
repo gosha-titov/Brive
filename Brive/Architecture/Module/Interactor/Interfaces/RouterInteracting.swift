@@ -1,4 +1,4 @@
-/// A type that all interactor interfaces for routers should conform to.
+/// An interface for the router trough which it communicates with this interactor.
 public protocol RouterInteracting: AnyObject {
     
     /// Activates this interactor.
