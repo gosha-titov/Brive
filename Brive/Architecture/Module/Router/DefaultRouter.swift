@@ -60,9 +60,9 @@ open class DefaultRouter {
     /// It activates this router and therefore the module.
     /// If you want to perform any additional work, do so in the `routerDidActivate()` method.
     func activate() -> Void {
-        interactor.activate()
         routerIsActivating()
         routerDidActivate()
+        interactor.activate()
     }
     
     /// Deactivates this router.
@@ -71,8 +71,8 @@ open class DefaultRouter {
     /// If you want to perform any additional work, do so in the `routerWillDeactivate()` method.
     func deactivate() -> Void {
         routerWillDeactivate()
-        routerIsDeactivating()
         interactor.deactivate()
+        routerIsDeactivating()
         parent = nil
         view = nil
     }

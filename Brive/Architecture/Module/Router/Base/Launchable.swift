@@ -18,18 +18,16 @@ public extension Launchable {
     func set(view: UIViewController?) -> Void {
         self.view = view
         if let self = self as? NavigationControllable {
-            self.rootController = UINavigationController()
-            view.executeSafely {
-                self.rootController!.pushViewController($0)
-            }
+            self.container = UINavigationController()
+            if let view { self.container!.pushViewController(view) }
         }
     }
     
     func launch(from window: UIWindow) -> Void {
         if let self = self as? NavigationControllable {
-            window.rootViewController = self.rootController
+            window.rootViewController = self.container
         } else if let self = self as? TabBarControllable {
-            window.rootViewController = self.rootController
+            window.rootViewController = self.container
         } else {
             window.rootViewController = view
         }

@@ -19,7 +19,7 @@
 		0C494F6228EE2AB300A0E325 /* DefaultRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F6128EE2AB300A0E325 /* DefaultRouter.swift */; };
 		0C494F6728EE2F5300A0E325 /* TabBarRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F6628EE2F5300A0E325 /* TabBarRouter.swift */; };
 		0C494F7328EEF76200A0E325 /* ModKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C494F7128EEF75800A0E325 /* ModKit.framework */; };
-		0C494F7528EF16BC00A0E325 /* ParentRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F7428EF16BC00A0E325 /* ParentRouter.swift */; };
+		0C494F7528EF16BC00A0E325 /* PresentationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F7428EF16BC00A0E325 /* PresentationRouter.swift */; };
 		0C494F7728EF1AF000A0E325 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F7628EF1AF000A0E325 /* NavigationRouter.swift */; };
 		0C494F7928EF221800A0E325 /* Controllable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C494F7828EF221800A0E325 /* Controllable.swift */; };
 		0C55D32428F0756F0039D4B5 /* Viewing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C55D32328F0756F0039D4B5 /* Viewing.swift */; };
@@ -50,7 +50,7 @@
 		0C494F6128EE2AB300A0E325 /* DefaultRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRouter.swift; sourceTree = "<group>"; };
 		0C494F6628EE2F5300A0E325 /* TabBarRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarRouter.swift; sourceTree = "<group>"; };
 		0C494F6C28EEF75800A0E325 /* ModKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ModKit.xcodeproj; path = ../ModKit/ModKit.xcodeproj; sourceTree = "<group>"; };
-		0C494F7428EF16BC00A0E325 /* ParentRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentRouter.swift; sourceTree = "<group>"; };
+		0C494F7428EF16BC00A0E325 /* PresentationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationRouter.swift; sourceTree = "<group>"; };
 		0C494F7628EF1AF000A0E325 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
 		0C494F7828EF221800A0E325 /* Controllable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controllable.swift; sourceTree = "<group>"; };
 		0C55D32328F0756F0039D4B5 /* Viewing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Viewing.swift; sourceTree = "<group>"; };
@@ -148,9 +148,8 @@
 			children = (
 				0C494F6628EE2F5300A0E325 /* TabBarRouter.swift */,
 				0C494F7628EF1AF000A0E325 /* NavigationRouter.swift */,
+				0C494F7428EF16BC00A0E325 /* PresentationRouter.swift */,
 				0C494F6128EE2AB300A0E325 /* DefaultRouter.swift */,
-				0C494F3328EDB0F600A0E325 /* Launchable.swift */,
-				0C494F3428EDB0F600A0E325 /* Routing.swift */,
 				0C494F6528EE2E4E00A0E325 /* Base */,
 			);
 			path = Router;
@@ -159,7 +158,8 @@
 		0C494F6528EE2E4E00A0E325 /* Base */ = {
 			isa = PBXGroup;
 			children = (
-				0C494F7428EF16BC00A0E325 /* ParentRouter.swift */,
+				0C494F3328EDB0F600A0E325 /* Launchable.swift */,
+				0C494F3428EDB0F600A0E325 /* Routing.swift */,
 				0C494F7828EF221800A0E325 /* Controllable.swift */,
 			);
 			path = Base;
@@ -294,7 +294,7 @@
 				0C494F7928EF221800A0E325 /* Controllable.swift in Sources */,
 				0C494F3E28EDB0F600A0E325 /* ControlInteractable.swift in Sources */,
 				0C494F3C28EDB0F600A0E325 /* Viewable.swift in Sources */,
-				0C494F7528EF16BC00A0E325 /* ParentRouter.swift in Sources */,
+				0C494F7528EF16BC00A0E325 /* PresentationRouter.swift in Sources */,
 				0C494F3D28EDB0F600A0E325 /* Interactable.swift in Sources */,
 				0C494F4928EDB0F600A0E325 /* AppBuildable.swift in Sources */,
 				0C494F6728EE2F5300A0E325 /* TabBarRouter.swift in Sources */,

@@ -2,7 +2,7 @@ import ModKit
 import UIKit
 
 /// The navigation router that owns child routers.
-open class NavigationRouter<Module, Builder: Buildable>: ParentRouter<Module, Builder>, NavigationControllable, Routing where Builder.Module == Module {
+open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Module, Builder>, NavigationControllable, Routing where Builder.Module == Module {
     
     /// Modules that each parent router can run.
     ///
@@ -20,7 +20,7 @@ open class NavigationRouter<Module, Builder: Buildable>: ParentRouter<Module, Bu
     /// It is connected to the window root view controller, that is, it is displayed on the screen.
     /// You should never change the navigation controller to another,
     /// because this and the following modules will not be displayed.
-    public final var rootController: UINavigationController?
+    public final var container: UINavigationController?
     
     /// An array of child modules that will be activated in advance.
     ///
@@ -44,16 +44,16 @@ open class NavigationRouter<Module, Builder: Buildable>: ParentRouter<Module, Bu
     ///
     public final func route(to module: Module, with input: Input? = nil) -> Void {
         
-        guard let rootController = rootController else { return }
+        guard let container = container else { return }
         if !children.hasKey(module) { build(module) }
         
         guard let child = children[module] else { return }
-        input.executeSafely { child.receive($0) }
+        if let input { child.receive(input) }
         
         if let child = child as? TabBarControllable {
-            rootController.pushViewController(child.rootController)
+            container.pushViewController(child.container)
         } else {
-            child.view.executeSafely { rootController.pushViewController($0) }
+            child.view.executeSafely { container.pushViewController($0) }
         }
         
     }
@@ -67,17 +67,7 @@ open class NavigationRouter<Module, Builder: Buildable>: ParentRouter<Module, Bu
     
     override func routerIsDeactivating() -> Void {
         detachAllChildren()
-        rootController = nil
-    }
-    
-    /// Builds the given module.
-    func build(_ module: Module) -> Void {
-        let (child, view) = builder.build(module)
-        attach(child, to: module)
-        child.view = view
-        if let child = child as? NavigationControllable {
-            child.rootController = rootController
-        }
+        container = nil
     }
     
 }

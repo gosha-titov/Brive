@@ -2,7 +2,7 @@ import ModKit
 import UIKit
 
 /// The tab bar router that owns child routers.
-open class TabBarRouter<Module, Builder: Buildable>: ParentRouter<Module, Builder>, TabBarControllable, Routing where Builder.Module == Module {
+open class TabBarRouter<Module, Builder: Buildable>: PresentationRouter<Module, Builder>, TabBarControllable, Routing where Builder.Module == Module {
     
     /// Modules that each parent router can run.
     ///
@@ -20,7 +20,7 @@ open class TabBarRouter<Module, Builder: Buildable>: ParentRouter<Module, Builde
     /// It is connected to the window root view controller, that is, it is displayed on the screen.
     /// You should never change the tab bar controller to another,
     /// because this and the following modules will not be displayed.
-    public final var rootController = UITabBarController()
+    public final var container = UITabBarController()
     
     /// The tab bar modules.
     ///
@@ -43,10 +43,10 @@ open class TabBarRouter<Module, Builder: Buildable>: ParentRouter<Module, Builde
     ///
     public final func route(to module: Module, with input: Input? = nil) -> Void {
         guard let index = tabBar.firstIndex(of: module) else { return }
-        if let child = children[module] {
-            input.executeSafely { child.receive($0) }
+        if let child = children[module], let input {
+            child.receive(input)
         }
-        rootController.selectedIndex = index
+        container.selectedIndex = index
     }
     
     
@@ -60,16 +60,16 @@ open class TabBarRouter<Module, Builder: Buildable>: ParentRouter<Module, Builde
             child.view = view
             if let child = child as? NavigationControllable {
                 let controller = UINavigationController()
-                child.rootController = controller
-                view.executeSafely { controller.pushViewController($0) }
+                child.container = controller
+                if let view { controller.pushViewController(view) }
                 views.append(controller)
             } else if let child = child as? TabBarControllable {
-                views.append(child.rootController)
+                views.append(child.container)
             } else {
-                view.executeSafely { views.append($0) }
+                if let view { views.append(view) }
             }
         }
-        rootController.setViewControllers(views, animated: true)
+        container.setViewControllers(views, animated: true)
     }
     
     override func routerIsDeactivating() -> Void {
