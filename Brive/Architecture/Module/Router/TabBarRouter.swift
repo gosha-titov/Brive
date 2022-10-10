@@ -97,7 +97,7 @@ open class TabBarRouter<Module, Builder: Buildable>: PresentationRouter<Module, 
         container.setViewControllers(views, animated: true)
     }
     
-    override func didBuild(_ child: DefaultRouter) {
+    override func childModuleDidBuild(_ child: DefaultRouter) {
         let view = child.view
         if let child = child as? any NavigationControllable {
             let container = UINavigationController()

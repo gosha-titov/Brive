@@ -140,12 +140,12 @@ open class PresentationRouter<Module, Builder: Buildable>: DefaultRouter, Routin
         let (child, view) = builder.build(module)
         attach(child, to: module)
         child.view = view
-        didBuild(child)
+        childModuleDidBuild(child)
         return child
     }
     
     /// Called after the module is built.
-    func didBuild(_ child: DefaultRouter) -> Void {}
+    func childModuleDidBuild(_ child: DefaultRouter) -> Void {}
     
     override func routerIsDeactivating() -> Void {
         detachAllChildren()

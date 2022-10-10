@@ -100,7 +100,7 @@ open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Modu
         activatedModulesInAdvance.forEach { build($0) }
     }
     
-    override func didBuild(_ child: DefaultRouter) {
+    override func childModuleDidBuild(_ child: DefaultRouter) {
         if let child = child as? any NavigationControllable {
             child.container = container
         }
