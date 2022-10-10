@@ -1,18 +1,21 @@
 import UIKit
 
+/// A type that requires you to have a  tab bar controller.
+protocol TabBarControllable: Controllable where Container == UITabBarController {}
+
+
 /// A type that requires you to have a navigation controller.
-protocol TabBarControllable: AnyObject {
-    
-    /// The navigation controller of this router.
-    var container: UITabBarController { get set }
-    
-}
+protocol NavigationControllable: Controllable where Container == UINavigationController {}
 
 
-/// A type that requires you to have a tab bar controller.
-protocol NavigationControllable: AnyObject {
+/// A type that requires you to have a container view controller.
+protocol Controllable: AnyObject {
     
-    /// The tab bar controller of this router.
-    var container: UINavigationController? { get set }
+    /// A type that can keep child view controllers.
+    associatedtype Container: UIViewController
+    
+    /// A container that keeps child view controllers.
+    /// It is a navigation or tab bar controller.
+    var container: Container { get set }
     
 }

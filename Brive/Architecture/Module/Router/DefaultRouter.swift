@@ -1,6 +1,18 @@
 import UIKit
 
-/// The default router that does not own child routers.
+/// A default router that does not own child routers.
+///
+/// The `DefaultRouter` class defines the shared behavior that’s common to all routers.
+/// You rarely create instances of the `DefaultRouter` class directly.
+/// Instead, you subclass it and add the methods and properties needed to manage the module.
+///
+/// The router's main responsibility is to activate and deactivate the module. The implementation is hidden,
+/// but if you want to perform any additional work, override ``routerDidActivate()``
+/// and ``routerWillDeactivate()`` methods.
+///
+/// The router can receive some data from its parent before being displayed.
+/// To handle this, override ``receive(_:)`` method.
+///
 open class DefaultRouter {
     
     /// Some data that is passed between parent and child modules.
@@ -15,8 +27,7 @@ open class DefaultRouter {
     /// The parent router of this router.
     ///
     /// If this router does not a parent router, the value in this property is `nil`.
-    /// You should never change this property.
-    public final var parent: DefaultRouter?
+    public internal(set) var parent: DefaultRouter?
     
     /// The view that will be displayed.
     var view: UIViewController?
@@ -28,25 +39,22 @@ open class DefaultRouter {
     ///
     /// Override this method to handle the input data.
     /// You don't need to call the `super` method.
-    /// You should never call this method.
     open func receive(_ input: Input) -> Void {}
     
     /// Called after the router is activated.
     ///
     /// Override this method to perform additional work.
-    /// You don't need to call the `super` method.
-    /// You should never call this method.
+    /// You need to call the `super` method.
     open func routerDidActivate() -> Void {}
     
     /// Called when the router is about to be deactivated.
     ///
     /// Override this method to perform additional work.
-    /// You don't need to call the `super` method.
-    /// You should never call this method.
+    /// You need to call the `super` method.
     open func routerWillDeactivate() -> Void {}
     
     
-    // MARK: Internal Methods
+    // MARK: - Internal Methods
     
     /// Called when the router is activating.
     func routerIsActivating() -> Void {}
@@ -58,8 +66,9 @@ open class DefaultRouter {
     /// Activates this router.
     ///
     /// It activates this router and therefore the module.
-    /// If you want to perform any additional work, do so in the `routerDidActivate()` method.
-    func activate() -> Void {
+    /// If you want to perform any additional work,
+    /// do so in the ``routerDidActivate()`` method.
+    final func activate() -> Void {
         routerIsActivating()
         routerDidActivate()
         interactor.activate()
@@ -68,8 +77,9 @@ open class DefaultRouter {
     /// Deactivates this router.
     ///
     /// It deactivates this router and therefore the module.
-    /// If you want to perform any additional work, do so in the `routerWillDeactivate()` method.
-    func deactivate() -> Void {
+    /// If you want to perform any additional work,
+    /// do so in the ``routerWillDeactivate()`` method.
+    final func deactivate() -> Void {
         routerWillDeactivate()
         interactor.deactivate()
         routerIsDeactivating()
@@ -85,8 +95,6 @@ open class DefaultRouter {
         self.interactor = interactor
     }
     
-    deinit {
-        deactivate()
-    }
+    deinit { deactivate() }
     
 }
