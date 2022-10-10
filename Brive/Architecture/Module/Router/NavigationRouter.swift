@@ -74,8 +74,7 @@ open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Modu
     public final func push(module: Module, with input: Input? = nil, animated: Bool = true) -> Void {
         
         // Build a module.
-        if !children.hasKey(module) { build(module) }
-        guard let child = children[module] else { return }
+        let child = buildChildModuleIfNeeded(module)
         if let input { child.receive(input) }
         
         // Look for a view that can be pushed.
@@ -97,10 +96,10 @@ open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Modu
     // MARK: - Internal Methods
     
     override func routerIsActivating() {
-        activatedModulesInAdvance.forEach { build($0) }
+        activatedModulesInAdvance.forEach { buildChildModuleIfNeeded($0) }
     }
     
-    override func childModuleDidBuild(_ child: DefaultRouter) {
+    override func didBuildChildModule(_ child: DefaultRouter) {
         if let child = child as? any NavigationControllable {
             child.container = container
         }

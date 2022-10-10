@@ -85,7 +85,7 @@ open class TabBarRouter<Module, Builder: Buildable>: PresentationRouter<Module, 
     override func routerIsActivating() -> Void {
         var views = [UIViewController]()
         for module in tabBar {
-            let child = build(module)
+            let child = buildChildModuleIfNeeded(module)
             if let child = child as? any NavigationControllable {
                 views.append(child.container)
             } else if let child = child as? any TabBarControllable {
@@ -97,7 +97,7 @@ open class TabBarRouter<Module, Builder: Buildable>: PresentationRouter<Module, 
         container.setViewControllers(views, animated: true)
     }
     
-    override func childModuleDidBuild(_ child: DefaultRouter) {
+    override func didBuildChildModule(_ child: DefaultRouter) {
         let view = child.view
         if let child = child as? any NavigationControllable {
             let container = UINavigationController()

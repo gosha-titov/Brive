@@ -85,8 +85,7 @@ open class PresentationRouter<Module, Builder: Buildable>: DefaultRouter, Routin
         guard let containerOrView else { return }
 
         // Build a module.
-        if !children.hasKey(module) { build(module) }
-        guard let child = children[module] else { return }
+        let child = buildChildModuleIfNeeded(module)
         if let input { child.receive(input) }
 
         // Look for a view that can be presented.
@@ -134,18 +133,23 @@ open class PresentationRouter<Module, Builder: Buildable>: DefaultRouter, Routin
         children.removeAll()
     }
     
-    /// Builds the given module.
+    /// Builds the given module if it's not been yet.
+    /// - Returns: The router of this module.
     @discardableResult
-    final func build(_ module: Module) -> (DefaultRouter) {
-        let (child, view) = builder.build(module)
-        attach(child, to: module)
-        child.view = view
-        childModuleDidBuild(child)
-        return child
+    final func buildChildModuleIfNeeded(_ module: Module) -> DefaultRouter {
+        if let child = children[module] {
+            return child
+        } else {
+            let (child, view) = builder.build(module)
+            attach(child, to: module)
+            child.view = view
+            didBuildChildModule(child)
+            return child
+        }
     }
     
-    /// Called after the module is built.
-    func childModuleDidBuild(_ child: DefaultRouter) -> Void {}
+    /// Called after the child module is built.
+    func didBuildChildModule(_ child: DefaultRouter) -> Void {}
     
     override func routerIsDeactivating() -> Void {
         detachAllChildren()
