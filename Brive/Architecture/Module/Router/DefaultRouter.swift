@@ -13,10 +13,16 @@ import UIKit
 /// The router can receive some data from its parent before being displayed.
 /// To handle this, override ``receive(_:)`` method.
 ///
+/// In order to complete this module and show the parent one,
+/// call ``complete(with:unloaded:animated:)`` method.
+///
 open class DefaultRouter {
     
     /// Some data that is passed between parent and child modules.
-    public typealias Input = Any
+    public typealias Value = Any
+    
+    /// A transition that can be performed to the child module.
+    enum Transition { case presented, pushed, selected }
     
     
     // MARK: - Properties
@@ -32,6 +38,9 @@ open class DefaultRouter {
     /// The view that will be displayed.
     var view: UIViewController?
     
+    /// The transition that was performed to this module.
+    var transition: Transition?
+    
     
     // MARK: - Open Methods
     
@@ -39,7 +48,7 @@ open class DefaultRouter {
     ///
     /// Override this method to handle the input data.
     /// You don't need to call the `super` method.
-    open func receive(_ input: Input) -> Void {}
+    open func receive(_ input: Value) -> Void {}
     
     /// Called after the router is activated.
     ///
@@ -52,6 +61,25 @@ open class DefaultRouter {
     /// Override this method to perform additional work.
     /// You need to call the `super` method.
     open func routerWillDeactivate() -> Void {}
+    
+    
+    // MARK: - Public Methods
+    
+    /// Completes the module.
+    ///
+    /// It hides this module and shows the parent one.
+    /// There are some cases when the method isn't executed:
+    /// - The router doesn't have a parent,
+    /// + The router is a tab of the parent tab bar router.
+    ///
+    /// - Parameter result: You can pass some data to the parent router. Default value is `nil`.
+    /// - Parameter unloaded: Pass `false` to keep this module loaded while the parent is loaded; otherwise, pass `true`. Default value is `true`.
+    /// - Parameter animated: Pass `true` to animate the transition; otherwise, pass `false`. Default value is `true`.
+    ///
+    public final func complete(with result: Value? = nil, unloaded: Bool = true, animated: Bool = true) -> Void {
+        guard let parent = parent as? ChildCancelable else { return }
+        parent.cancel(self, with: result, unloaded, animated)
+    }
     
     
     // MARK: - Internal Methods

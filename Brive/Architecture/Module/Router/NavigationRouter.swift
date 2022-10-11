@@ -14,6 +14,9 @@ import UIKit
 /// The router can receive some data from its parent before being displayed.
 /// To handle this, override ``receive(_:)`` method.
 ///
+/// In order to complete this module and show the parent one,
+/// call ``complete(with:unloaded:animated:)`` method.
+///
 /// **The essence of a parent router is to own child modules and route to them.**
 ///
 /// Each child router is attached to its module. Use `Enumeration` to create modules as it's done in the example:
@@ -28,6 +31,8 @@ import UIKit
 /// If you need to load some modules in advance, specify them as in the example:
 ///
 ///     router.activatedModulesInAdvance = [.feed, .messages]
+///
+/// You can handle result of a child module's completion by overriding the ``childDidComplete(_:with:)`` method.
 ///
 /// You have two kind of transition to child modules:
 /// - use ``push(module:with:animated:)`` method to push a child module onto the navigation stack,
@@ -56,7 +61,7 @@ open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Modu
     
     // MARK: - Open Methods
     
-    override open func route(to module: Module, with input: Input? = nil) {
+    override open func route(to module: Module, with input: Value? = nil) {
         push(module: module, with: input)
     }
     
@@ -71,7 +76,7 @@ open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Modu
     /// - Parameter input: Some value to pass to this module before the module is displayed.
     /// - Parameter animated: Pass `true` to animate the transition; otherwise, pass `false`.
     ///
-    public final func push(module: Module, with input: Input? = nil, animated: Bool = true) -> Void {
+    public final func push(module: Module, with input: Value? = nil, animated: Bool = true) -> Void {
         
         // Build a module.
         let child = buildChildModuleIfNeeded(module)
@@ -86,6 +91,7 @@ open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Modu
         // Try to push
         if let viewToPush {
             container.pushViewController(viewToPush, animated: animated)
+            child.transition = .pushed
         } else {
             child.view = container
         }

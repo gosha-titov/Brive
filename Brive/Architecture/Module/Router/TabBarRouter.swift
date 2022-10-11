@@ -14,6 +14,9 @@ import UIKit
 /// The router can receive some data from its parent before being displayed.
 /// To handle this, override ``receive(_:)`` method.
 ///
+/// In order to complete this module and show the parent one,
+/// call ``complete(with:unloaded:animated:)`` method.
+///
 /// **The essence of a parent router is to own child modules and route to them.**
 ///
 /// Each child router is attached to its module. Use `Enumeration` to create modules as it's done in the example:
@@ -22,12 +25,14 @@ import UIKit
 ///
 /// Pay attention, that the router and builder `Module` structs are the same.
 ///
-/// The navigation router uses a tab bar controller that manages a multiselection interface,
+/// The tab bar router uses a tab bar controller that manages a multiselection interface,
 /// where the selection determines which child view controller to display.
 ///
 /// You need to set tab bar modules before this module is activated, do it as in the example:
 ///
 ///     router.tabBar = [.feed, .messages, .settings]
+///
+/// You can handle result of a child module's completion by overriding the ``childDidComplete(_:with:)`` method.
 ///
 /// You have two kind of transition to child modules:
 /// - use ``select(module:with:)`` method to switch to the module, but it doesn't work with unspecified modules,
@@ -58,7 +63,7 @@ open class TabBarRouter<Module, Builder: Buildable>: PresentationRouter<Module, 
     
     // MARK: - Open Methods
     
-    override open func route(to module: Module, with input: Input? = nil) {
+    override open func route(to module: Module, with input: Value? = nil) {
         select(module: module, with: input)
     }
     
@@ -71,10 +76,10 @@ open class TabBarRouter<Module, Builder: Buildable>: PresentationRouter<Module, 
     ///     - module: A child module that will be shown.
     ///     - input: Some value that you want to pass to this module before it is shown.
     ///
-    public final func select(module: Module, with input: Input? = nil) -> Void {
+    public final func select(module: Module, with input: Value? = nil) -> Void {
         guard let index = tabBar.firstIndex(of: module) else { return }
-        if let child = children[module], let input {
-            child.receive(input)
+        if let child = children[module] {
+            if let input { child.receive(input) }
         }
         container.selectedIndex = index
     }
@@ -93,6 +98,7 @@ open class TabBarRouter<Module, Builder: Buildable>: PresentationRouter<Module, 
             } else if let view = child.view {
                 views.append(view)
             }
+            child.transition = .selected
         }
         container.setViewControllers(views, animated: true)
     }
