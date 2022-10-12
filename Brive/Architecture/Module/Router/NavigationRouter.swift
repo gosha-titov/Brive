@@ -18,12 +18,7 @@ import UIKit
 /// call ``complete(with:unloaded:animated:)`` method.
 ///
 /// **The essence of a parent router is to own child modules and route to them.**
-///
-/// Each child router is attached to its module. Use `Enumeration` to create modules as it's done in the example:
-///
-///     enum SomeModule { case feed, messages, settings }
-///
-/// Pay attention, that the router and builder `Module` structs are the same.
+/// Each child router is attached to its module.
 ///
 /// The navigation router uses a navigation controller, that is, its view is embedded in the navigation interface.
 ///
@@ -40,7 +35,7 @@ import UIKit
 ///
 /// Or you can use ``route(to:with:)`` method of `Routing` protocol that calls the first method.
 ///
-open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Module, Builder>, NavigationControllable where Builder.Module == Module {
+open class NavigationRouter<Builder: Buildable>: PresentationRouter<Builder>, NavigationControllable {
     
     // MARK: - Properties
     

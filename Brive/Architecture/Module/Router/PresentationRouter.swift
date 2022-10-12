@@ -18,19 +18,17 @@ import UIKit
 /// call ``complete(with:unloaded:animated:)`` method.
 ///
 /// **The essence of a parent router is to own child modules and route to them.**
-///
-/// Each child router is attached to its module. Use `Enumeration` to create modules as it's done in the example:
-///
-///     enum SomeModule { case feed, messages, settings }
-///
-/// Pay attention, that the router and builder modules are the same.
+/// Each child router is attached to its module.
 ///
 /// You can handle result of a child module's completion by overriding the ``childDidComplete(_:with:)`` method.
 ///
 /// Use ``present(module:with:animated:completion:)`` method to present a child module modally.
 /// The ``route(to:with:)`` method of `Routing` protocol that does the same thing.
 ///
-open class PresentationRouter<Module, Builder: Buildable>: DefaultRouter, ChildCancelable, Routing where Builder.Module == Module {
+open class PresentationRouter<Builder: Buildable>: DefaultRouter, ChildCancelable, Routing {
+    
+    /// Child modules of this module.
+    public typealias Module = Builder.Module
     
     // MARK: - Internal Properties
     
@@ -73,8 +71,8 @@ open class PresentationRouter<Module, Builder: Buildable>: DefaultRouter, ChildC
     /// If module has not been built yet, then this method builds, activates and presents it.
     ///
     /// - Parameter module: A child module to display.
-    /// - Parameter input: Some value to pass to this module before the module is displayed.
-    /// - Parameter animated: Pass `true` to animate the presentation; otherwise, pass `false`.
+    /// - Parameter input: Some value to pass to this module before the module is displayed. Default value is `nil`.
+    /// - Parameter animated: Pass `true` to animate the presentation; otherwise, pass `false`. Default value is `true`.
     /// - Parameter completion: The block to execute after the presentation finishes. This block has no return value and takes no parameters.
     ///
     public final func present(module: Module, with input: Value? = nil, animated: Bool = true, completion: (() -> Void)? = nil) -> Void {
@@ -101,14 +99,14 @@ open class PresentationRouter<Module, Builder: Buildable>: DefaultRouter, ChildC
     /// Hides and unloads the given router.
     final func cancel(_ child: DefaultRouter, with result: Value?, _ unloaded: Bool, _ animated: Bool) -> Void {
         
-        guard let module = children.key(byReference: child),
-              let transition = child.transition
-        else { return }
+        guard let module = children.key(byReference: child) else { return }
         
-        switch transition {
-        case .pushed: (view as? UINavigationController)?.popViewController(animated: animated)
-        case .presented: child.view?.dismiss(animated: animated)
-        case .selected: return
+        if let transition = child.transition {
+            switch transition {
+            case .pushed: (view as? UINavigationController)?.popViewController(animated: animated)
+            case .presented: child.view?.dismiss(animated: animated)
+            case .selected: return
+            }
         }
         
         if unloaded { detachChild(from: module) }
