@@ -4,7 +4,11 @@ import UIKit
 public protocol Buildable: AnyObject {
     
     /// Modules that each parent router can run.
-    /// To implement this, use `Enumeration`.
+    /// Each child router is attached to its module.
+    /// To implement this, use `Enumeration` as in the examle:
+    ///
+    ///     enum Module { case .feed, .messages, .settings }
+    ///
     associatedtype Module: Hashable
     
     /// Builds the given module.

@@ -17,6 +17,12 @@ import UIKit
 /// In order to complete this module and show the parent one,
 /// call ``complete(with:unloaded:animated:)`` method.
 ///
+/// You can communicate with a parent through your child-to-parent interface:
+///
+///     if let parent = parent as? YourChildToParentInterface {
+///         parent.doSomething()
+///     }
+///
 /// **The essence of a parent router is to own child modules and route to them.**
 /// Each child router is attached to its module.
 ///

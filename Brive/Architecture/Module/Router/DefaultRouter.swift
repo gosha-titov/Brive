@@ -1,6 +1,6 @@
 import UIKit
 
-/// A default router that does not own child routers.
+/// A default router that doesn't own child routers.
 ///
 /// The `DefaultRouter` class defines the shared behavior that’s common to all routers.
 /// You rarely create instances of the `DefaultRouter` class directly.
@@ -15,6 +15,12 @@ import UIKit
 ///
 /// In order to complete this module and show the parent one,
 /// call ``complete(with:unloaded:animated:)`` method.
+///
+/// You can communicate with a parent through your child-to-parent interface:
+///
+///     if let parent = parent as? YourChildToParentInterface {
+///         parent.doSomething()
+///     }
 ///
 open class DefaultRouter {
     
@@ -91,22 +97,14 @@ open class DefaultRouter {
     func routerIsDeactivating() -> Void {}
     
     
-    /// Activates this router.
-    ///
-    /// It activates this router and therefore the module.
-    /// If you want to perform any additional work,
-    /// do so in the ``routerDidActivate()`` method.
+    /// Activates this router and therefore its module.
     final func activate() -> Void {
         routerIsActivating()
-        routerDidActivate()
         interactor.activate()
+        routerDidActivate()
     }
     
-    /// Deactivates this router.
-    ///
-    /// It deactivates this router and therefore the module.
-    /// If you want to perform any additional work,
-    /// do so in the ``routerWillDeactivate()`` method.
+    /// Deactivates this router and therefore its module.
     final func deactivate() -> Void {
         routerWillDeactivate()
         interactor.deactivate()
