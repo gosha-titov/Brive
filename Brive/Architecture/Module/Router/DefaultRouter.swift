@@ -21,7 +21,7 @@ open class DefaultRouter {
     /// Some data that is passed between parent and child modules.
     public typealias Value = Any
     
-    /// A transition that can be performed to the child module.
+    /// A transition that is performed to the child module.
     enum Transition { case presented, pushed, selected }
     
     
@@ -35,7 +35,7 @@ open class DefaultRouter {
     /// If this router does not a parent router, the value in this property is `nil`.
     public internal(set) var parent: DefaultRouter?
     
-    /// The view that will be displayed.
+    /// The view to display.
     var view: UIViewController?
     
     /// The transition that was performed to this module.
@@ -53,13 +53,13 @@ open class DefaultRouter {
     /// Called after the router is activated.
     ///
     /// Override this method to perform additional work.
-    /// You need to call the `super` method.
+    /// You don't need to call the `super` method.
     open func routerDidActivate() -> Void {}
     
     /// Called when the router is about to be deactivated.
     ///
     /// Override this method to perform additional work.
-    /// You need to call the `super` method.
+    /// You don't need to call the `super` method.
     open func routerWillDeactivate() -> Void {}
     
     

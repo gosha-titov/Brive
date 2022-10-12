@@ -44,11 +44,6 @@ open class TabBarRouter<Module, Builder: Buildable>: PresentationRouter<Module, 
      
     // MARK: - Properties
     
-    /// The tab bat controller.
-    ///
-    /// It is connected to the window root view controller, that is, it is displayed on the screen.
-    public internal(set) var container = UITabBarController()
-    
     /// The tab bar modules.
     ///
     /// Before activation, you need to set all child modules in the order in which they should be displayed.
@@ -77,38 +72,37 @@ open class TabBarRouter<Module, Builder: Buildable>: PresentationRouter<Module, 
     ///     - input: Some value that you want to pass to this module before it is shown.
     ///
     public final func select(module: Module, with input: Value? = nil) -> Void {
-        guard let index = tabBar.firstIndex(of: module) else { return }
+        guard let index = tabBar.firstIndex(of: module),
+              let controller = view as? UITabBarController
+        else { return }
         if let child = children[module] {
             if let input { child.receive(input) }
         }
-        container.selectedIndex = index
+        controller.selectedIndex = index
     }
     
     
     // MARK: - Internal Methods
     
     override func routerIsActivating() -> Void {
+        let controller = UITabBarController()
+        view = controller
         var views = [UIViewController]()
         for module in tabBar {
             let child = buildChildModuleIfNeeded(module)
-            if let child = child as? any NavigationControllable {
-                views.append(child.container)
-            } else if let child = child as? any TabBarControllable {
-                views.append(child.container)
-            } else if let view = child.view {
+            if let view = child.view {
+                child.transition = .selected
                 views.append(view)
             }
-            child.transition = .selected
         }
-        container.setViewControllers(views, animated: true)
+        controller.setViewControllers(views, animated: true)
     }
     
     override func didBuildChildModule(_ child: DefaultRouter) {
-        let view = child.view
-        if let child = child as? any NavigationControllable {
-            let container = UINavigationController()
-            if let view { container.pushViewController(view) }
-            child.container = container
+        if let child = child as? NavigationControllable {
+            child.embedView()
+        } else if child.view.isNil {
+            child.view = .init()
         }
     }
     

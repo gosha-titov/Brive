@@ -44,11 +44,6 @@ open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Modu
     
     // MARK: - Properties
     
-    /// The navigation controller.
-    ///
-    /// It is connected to the window root view controller, that is, it is displayed on the screen.
-    public internal(set) var container = UINavigationController()
-    
     /// An array of child modules that will be activated in advance.
     ///
     /// Add сhild modules here if you want them to be activated when this module does.
@@ -78,22 +73,17 @@ open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Modu
     ///
     public final func push(module: Module, with input: Value? = nil, animated: Bool = true) -> Void {
         
-        // Build a module.
+        guard let controller = view as? UINavigationController else { return }
+        
         let child = buildChildModuleIfNeeded(module)
         if let input { child.receive(input) }
         
-        // Look for a view that can be pushed.
-        var viewToPush: UIViewController? = child.view
-        if let child = child as? any TabBarControllable {
-            viewToPush = child.container
-        }
-        
-        // Try to push
-        if let viewToPush {
-            container.pushViewController(viewToPush, animated: animated)
+        if let view = child.view {
+            controller.pushViewController(view, animated: animated)
+            if child is NavigationControllable { child.view = controller }
             child.transition = .pushed
         } else {
-            child.view = container
+            child.view = controller
         }
         
     }
@@ -101,14 +91,18 @@ open class NavigationRouter<Module, Builder: Buildable>: PresentationRouter<Modu
     
     // MARK: - Internal Methods
     
-    override func routerIsActivating() {
-        activatedModulesInAdvance.forEach { buildChildModuleIfNeeded($0) }
+    /// Embeds view in the navigation controller.
+    func embedView() -> Void {
+        let controller = UINavigationController()
+        if let view {
+            controller.pushViewController(view)
+            transition = .pushed
+        }
+        view = controller
     }
     
-    override func didBuildChildModule(_ child: DefaultRouter) {
-        if let child = child as? any NavigationControllable {
-            child.container = container
-        }
+    override func routerIsActivating() {
+        activatedModulesInAdvance.forEach { buildChildModuleIfNeeded($0) }
     }
     
 }

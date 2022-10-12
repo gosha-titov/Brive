@@ -78,46 +78,19 @@ open class PresentationRouter<Module, Builder: Buildable>: DefaultRouter, ChildC
     /// - Parameter completion: The block to execute after the presentation finishes. This block has no return value and takes no parameters.
     ///
     public final func present(module: Module, with input: Value? = nil, animated: Bool = true, completion: (() -> Void)? = nil) -> Void {
-        
-        // Look for a view that can present.
-        var containerOrView = view
-        
-        // For some reasons, this project doesn't build but Playground does and work.
-        // Error: Command CompileSwift failed with a nonzero exit code.
-//        if let self = self as? any Controllable {
-//            containerOrView = self.container
-//        }
-        
-        if let self = self as? any TabBarControllable {
-            containerOrView = self.container
-        } else if let self = self as? any NavigationControllable {
-            containerOrView = self.container
-        }
-        guard let containerOrView else { return }
 
-        // Build a module.
         let child = buildChildModuleIfNeeded(module)
         if let input { child.receive(input) }
-        child.transition = .presented
-
-        // Look for a view that can be presented.
-        var viewToPresent: UIViewController? = child.view
         
-//        if let child = child as? any Controllable {
-//            viewToPresent = child.container
-//        }
-        
-        if let child = child as? any TabBarControllable {
-            viewToPresent = child.container
-        } else if let child = child as? any NavigationControllable {
-            viewToPresent = child.container
+        if !(self is Controllable), let child = child as? NavigationControllable {
+            child.embedView()
         }
         
-        // Try to present
-        if let viewToPresent {
-            containerOrView.present(viewToPresent, animated: animated, completion: completion)
+        if let viewToPresent = child.view {
+            view?.present(viewToPresent, animated: animated, completion: completion)
+            child.transition = .presented
         } else {
-            child.view = containerOrView
+            child.view = view
         }
         
     }
@@ -133,16 +106,9 @@ open class PresentationRouter<Module, Builder: Buildable>: DefaultRouter, ChildC
         else { return }
         
         switch transition {
-        case .pushed: (self as? any NavigationControllable)?.container.popViewController(animated: animated)
+        case .pushed: (view as? UINavigationController)?.popViewController(animated: animated)
+        case .presented: child.view?.dismiss(animated: animated)
         case .selected: return
-        case .presented:
-            var containerOrView = child.view
-            if let child = child as? any TabBarControllable {
-                containerOrView = child.container
-            } else if let child = child as? any NavigationControllable {
-                containerOrView = child.container
-            }
-            containerOrView?.dismiss(animated: true)
         }
         
         if unloaded { detachChild(from: module) }
