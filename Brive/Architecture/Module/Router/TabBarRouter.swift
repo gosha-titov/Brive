@@ -56,6 +56,11 @@ open class TabBarRouter<Builder: Buildable>: PresentationRouter<Builder>, TabBar
         didSet { tabBar.removeDuplicates() }
     }
     
+    /// Returns a tab bar controller used for this module.
+    public final var controller: UITabBarController? {
+        return view as? UITabBarController
+    }
+    
     
     // MARK: - Open Methods
     
@@ -73,9 +78,7 @@ open class TabBarRouter<Builder: Buildable>: PresentationRouter<Builder>, TabBar
     ///     - input: Some value that you want to pass to this module before it is shown.
     ///
     public final func select(module: Module, with input: Value? = nil) -> Void {
-        guard let index = tabBar.firstIndex(of: module),
-              let controller = view as? UITabBarController
-        else { return }
+        guard let index = tabBar.firstIndex(of: module), let controller else { return }
         if let child = children[module] {
             if let input { child.receive(input) }
         }

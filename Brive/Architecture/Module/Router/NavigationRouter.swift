@@ -54,6 +54,11 @@ open class NavigationRouter<Builder: Buildable>: PresentationRouter<Builder>, Na
         didSet { activatedModulesInAdvance.removeDuplicates() }
     }
     
+    /// Returns a navigation controller used for this module.
+    public final var controller: UINavigationController? {
+        return view as? UINavigationController
+    }
+    
     
     // MARK: - Open Methods
     
@@ -74,7 +79,7 @@ open class NavigationRouter<Builder: Buildable>: PresentationRouter<Builder>, Na
     ///
     public final func push(module: Module, with input: Value? = nil, animated: Bool = true) -> Void {
         
-        guard let controller = view as? UINavigationController else { return }
+        guard let controller else { return }
         
         let child = buildChildModuleIfNeeded(module)
         if let input { child.receive(input) }
@@ -96,7 +101,7 @@ open class NavigationRouter<Builder: Buildable>: PresentationRouter<Builder>, Na
     func embedView() -> Void {
         let controller = UINavigationController()
         if let view {
-            controller.pushViewController(view)
+            controller.pushViewController(view, animated: true)
             transition = .pushed
         }
         view = controller
