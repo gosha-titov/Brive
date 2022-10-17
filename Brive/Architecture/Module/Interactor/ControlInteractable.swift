@@ -6,6 +6,6 @@ public protocol ControlInteractable: AnyObject {
     associatedtype Routing
     
     /// The router that is responsible for navigation between screens.
-    var router: Routing { get }
+    var router: Routing? { get set }
     
 }
