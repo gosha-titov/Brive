@@ -7,7 +7,7 @@ public protocol AppBuildable: AnyObject {
     associatedtype RootRouter: Launchable
     
     /// Builds the root module.
-    /// - Returns: The root router of this module and the view to display.
-    func buildRootModule() -> (RootRouter, UIViewController?)
+    /// - Returns: The root router of this module.
+    func buildRootModule() -> RootRouter
     
 }

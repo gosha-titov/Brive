@@ -7,9 +7,9 @@ import UIKit
 /// You rarely create instances of the `NavigationRouter` class directly.
 /// Instead, you subclass it and add the methods and properties needed to manage the module.
 ///
-/// The router's main responsibility is to activate and deactivate the module. The implementation is hidden,
-/// but if you want to perform any additional work, override ``routerDidActivate()``
-/// and ``routerWillDeactivate()`` methods.
+/// The router's main responsibility is to load and unload the module. The implementation is hidden,
+/// but if you want to perform any additional work, override ``routerDidLoad()``
+/// and ``routerWillUnload()`` methods.
 ///
 /// The router can receive some data from its parent before being displayed.
 /// To handle this, override ``receive(_:)`` method.
@@ -41,7 +41,7 @@ import UIKit
 ///
 /// Or you can use ``route(to:with:)`` method of `Routing` protocol that calls the first method.
 ///
-open class NavigationRouter<Builder: Buildable>: PresentationRouter<Builder>, NavigationControllable {
+open class NavigationRouter<Builder: Buildable, Interacting: RouterToInteractorInterface>: PresentationRouter<Builder, Interacting>, NavigationControllable {
     
     // MARK: - Properties
     
@@ -82,7 +82,7 @@ open class NavigationRouter<Builder: Buildable>: PresentationRouter<Builder>, Na
         guard let controller else { return }
         
         let child = buildChildModuleIfNeeded(module)
-        if let input { child.receive(input) }
+        if let input { child.parentWillDisplay(with: input) }
         
         if let view = child.view {
             controller.pushViewController(view, animated: animated)
@@ -107,7 +107,7 @@ open class NavigationRouter<Builder: Buildable>: PresentationRouter<Builder>, Na
         view = controller
     }
     
-    override func routerIsActivating() {
+    override func routerIsLoading() {
         activatedModulesInAdvance.forEach { buildChildModuleIfNeeded($0) }
     }
     

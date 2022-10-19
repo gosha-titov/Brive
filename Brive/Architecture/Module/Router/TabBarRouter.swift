@@ -7,9 +7,9 @@ import UIKit
 /// You rarely create instances of the `TabBarRouter` class directly.
 /// Instead, you subclass it and add the methods and properties needed to manage the module.
 ///
-/// The router's main responsibility is to activate and deactivate the module. The implementation is hidden,
-/// but if you want to perform any additional work, override ``routerDidActivate()``
-/// and ``routerWillDeactivate()`` methods.
+/// The router's main responsibility is to load and unload the module. The implementation is hidden,
+/// but if you want to perform any additional work, override ``routerDidLoad()``
+/// and ``routerWillUnload()`` methods.
 ///
 /// The router can receive some data from its parent before being displayed.
 /// To handle this, override ``receive(_:)`` method.
@@ -41,7 +41,7 @@ import UIKit
 ///
 /// Or you can use ``route(to:with:)`` method of `Routing` protocol that calls the first method.
 ///
-open class TabBarRouter<Builder: Buildable>: PresentationRouter<Builder>, TabBarControllable {
+open class TabBarRouter<Builder: Buildable, Interacting: RouterToInteractorInterface>: PresentationRouter<Builder, Interacting>, TabBarControllable {
      
     // MARK: - Properties
     
@@ -80,7 +80,7 @@ open class TabBarRouter<Builder: Buildable>: PresentationRouter<Builder>, TabBar
     public final func select(module: Module, with input: Value? = nil) -> Void {
         guard let index = tabBar.firstIndex(of: module), let controller else { return }
         if let child = children[module] {
-            if let input { child.receive(input) }
+            if let input { child.parentWillDisplay(with: input) }
         }
         controller.selectedIndex = index
     }
@@ -88,21 +88,22 @@ open class TabBarRouter<Builder: Buildable>: PresentationRouter<Builder>, TabBar
     
     // MARK: - Internal Methods
     
-    override func routerIsActivating() -> Void {
+    override func routerIsLoading() -> Void {
         let controller = UITabBarController()
         view = controller
         var views = [UIViewController]()
+        if tabBar.isEmpty { tabBar = allChildModules }
         for module in tabBar {
             let child = buildChildModuleIfNeeded(module)
             if let view = child.view {
-                child.transition = .selected
+                child.transition = .permanent
                 views.append(view)
             }
         }
         controller.setViewControllers(views, animated: true)
     }
     
-    override func didBuildChildModule(_ child: DefaultRouter) {
+    override func didBuildChildModule(_ child: Routable) {
         if let child = child as? NavigationControllable {
             child.embedView()
         } else if child.view.isNil {

@@ -1,7 +1,10 @@
 import ModKit
 import UIKit
 
-open class View: UIViewController, Viewing {
+open class View<Interacting: ViewToInteractorInterface>: UIViewController, Viewable, InteractorToViewInterface {
+    
+    public weak var interactor: Interacting?
+    
     
     // MARK: - Properties
     

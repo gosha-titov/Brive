@@ -6,67 +6,41 @@ import UIKit
 /// You rarely create instances of the `DefaultRouter` class directly.
 /// Instead, you subclass it and add the methods and properties needed to manage the module.
 ///
-/// The router's main responsibility is to activate and deactivate the module. The implementation is hidden,
-/// but if you want to perform any additional work, override ``routerDidActivate()``
-/// and ``routerWillDeactivate()`` methods.
+/// The router's main responsibility is to load and unload the module. The implementation is hidden,
+/// but if you want to perform any additional work, override ``routerDidLoad()``
+/// and ``routerWillUnload()`` methods.
 ///
 /// The router can receive some data from its parent before being displayed.
 /// To handle this, override ``receive(_:)`` method.
 ///
 /// In order to complete this module and show the parent one,
 /// call ``complete(with:unloaded:animated:)`` method.
-///
-/// You can communicate with a parent through your child-to-parent interface:
-///
-///     if let parent = parent as? YourChildToParentInterface {
-///         parent.doSomething()
-///     }
-///
-open class DefaultRouter {
+/// 
+open class DefaultRouter<Interacting: RouterToInteractorInterface>: Routable {
     
     /// Some data that is passed between parent and child modules.
     public typealias Value = Any
-    
-    /// A transition that is performed to the child module.
-    enum Transition { case presented, pushed, selected }
     
     
     // MARK: - Properties
     
     /// The interactor that is responsible for business logic.
-    public let interactor: RouterInteracting
-    
-    /// The parent router of this router.
-    ///
-    /// If this router does not a parent router, the value in this property is `nil`.
-    public internal(set) var parent: DefaultRouter?
-    
-    /// The view to display.
-    var view: UIViewController?
-    
-    /// The transition that was performed to this module.
-    var transition: Transition?
+    public let interactor: Interacting
     
     
     // MARK: - Open Methods
     
-    /// Called before the module is shown if some data has been passed.
-    ///
-    /// Override this method to handle the input data.
-    /// You don't need to call the `super` method.
-    open func receive(_ input: Value) -> Void {}
-    
-    /// Called after the router is activated.
+    /// Called after the router is loaded.
     ///
     /// Override this method to perform additional work.
     /// You don't need to call the `super` method.
-    open func routerDidActivate() -> Void {}
+    open func routerDidLoad() -> Void {}
     
-    /// Called when the router is about to be deactivated.
+    /// Called when the router is about to be unloaded.
     ///
     /// Override this method to perform additional work.
     /// You don't need to call the `super` method.
-    open func routerWillDeactivate() -> Void {}
+    open func routerWillUnload() -> Void {}
     
     
     // MARK: - Public Methods
@@ -79,36 +53,55 @@ open class DefaultRouter {
     /// + The router is a tab of the parent tab bar router.
     ///
     /// - Parameter result: You can pass some data to the parent router. Default value is `nil`.
-    /// - Parameter unloaded: Pass `false` to keep this module loaded while the parent is loaded; otherwise, pass `true`. Default value is `true`.
+    /// - Parameter loaded: Pass `true` to keep this module loaded while the parent is loaded; otherwise, pass `false`. Default value is `true`.
     /// - Parameter animated: Pass `true` to animate the transition; otherwise, pass `false`. Default value is `true`.
     ///
-    public final func complete(with result: Value? = nil, unloaded: Bool = true, animated: Bool = true) -> Void {
-        guard let parent = parent as? ChildCancelable else { return }
-        parent.cancel(self, with: result, unloaded, animated)
+    public final func complete(with result: Value? = nil, loaded: Bool = true, animated: Bool = true) -> Void {
+        guard let parent = parent as? ChildHideable else { return }
+        parent.hide(self, with: result, animated, keep: loaded)
     }
     
     
     // MARK: - Internal Methods
     
-    /// Called when the router is activating.
-    func routerIsActivating() -> Void {}
-    
-    /// Called when the router is deactivating.
-    func routerIsDeactivating() -> Void {}
-    
-    
-    /// Activates this router and therefore its module.
-    final func activate() -> Void {
-        routerIsActivating()
-        interactor.activate()
-        routerDidActivate()
+    /// Called before the parent module displayes this module.
+    final func parentWillDisplay(with input: Value?) -> Void {
+        guard let interactor = interactor as? ParentDisplayable else { return }
+        interactor.parentWillDisplay(with: input)
     }
     
-    /// Deactivates this router and therefore its module.
-    final func deactivate() -> Void {
-        routerWillDeactivate()
+    /// Called when the parent module passes some value.
+    final func receiveFromParent(_ value: Value) -> Void {
+        guard let interactor = interactor as? Receivable else { return }
+        interactor.receiveFromParent(value)
+    }
+    
+    /// Passes some value to a parent interactor.
+    final func passToParent(_ value: Value) -> Void {
+        guard let parent else { return }
+        parent.receiveFromChild(self, value)
+    }
+    
+    /// Called when the router is loading.
+    func routerIsLoading() -> Void {}
+    
+    /// Called when the router is unloading.
+    func routerIsUnloading() -> Void {}
+    
+    /// Loads this router and therefore its module.
+    final override func load() -> Void {
+        guard let interactor = interactor as? Eventable else { return }
+        routerIsLoading()
+        routerDidLoad()
+        interactor.activate()
+    }
+    
+    /// Unloads this router and therefore its module.
+    final override func unload() -> Void {
+        guard let interactor = interactor as? Eventable else { return }
+        routerWillUnload()
         interactor.deactivate()
-        routerIsDeactivating()
+        routerIsUnloading()
         parent = nil
         view = nil
     }
@@ -117,10 +110,10 @@ open class DefaultRouter {
     // MARK: - Init
     
     /// Creates a router with interactor.
-    public init(interactor: RouterInteracting) {
+    public init(interactor: Interacting) {
         self.interactor = interactor
     }
     
-    deinit { deactivate() }
+    deinit { unload() }
     
 }

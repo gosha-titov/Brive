@@ -7,9 +7,9 @@ import UIKit
 /// You rarely create instances of the `PresentationRouter` class directly.
 /// Instead, you subclass it and add the methods and properties needed to manage the module.
 ///
-/// The router's main responsibility is to activate and deactivate the module. The implementation is hidden,
-/// but if you want to perform any additional work, override ``routerDidActivate()``
-/// and ``routerWillDeactivate()`` methods.
+/// The router's main responsibility is to load and unload the module. The implementation is hidden,
+/// but if you want to perform any additional work, override ``routerDidLoad()``
+/// and ``routerWillUnload()`` methods.
 ///
 /// The router can receive some data from its parent before being displayed.
 /// To handle this, override ``receive(_:)`` method.
@@ -31,15 +31,17 @@ import UIKit
 /// Use ``present(module:with:animated:completion:)`` method to present a child module modally.
 /// The ``route(to:with:)`` method of `Routing` protocol that does the same thing.
 ///
-open class PresentationRouter<Builder: Buildable>: DefaultRouter, ChildCancelable, Routing {
+open class PresentationRouter<Builder: Buildable, Interacting: RouterToInteractorInterface>: DefaultRouter<Interacting>, Routing {
     
     /// Child modules of this module.
     public typealias Module = Builder.Module
     
     // MARK: - Internal Properties
     
+    var allChildModules = Module.allCases.map{$0}
+    
     /// The dictionary of routers that are children of the current router.
-    var children = [Module: DefaultRouter]()
+    var children = [Module: Routable]()
     
     /// The builder that builds child modules.
     let builder: Builder
@@ -63,13 +65,6 @@ open class PresentationRouter<Builder: Buildable>: DefaultRouter, ChildCancelabl
         present(module: module, with: input)
     }
     
-    /// Called after the child module is completed.
-    ///
-    /// Override this method to handle the result.
-    /// You don't need to call the `super` method.
-    open func childDidComplete(_ module: Module, with result: Value?) -> Void {}
-    
-    
     // MARK: - Public Methods
     
     /// Presents the given module modally.
@@ -81,10 +76,10 @@ open class PresentationRouter<Builder: Buildable>: DefaultRouter, ChildCancelabl
     /// - Parameter animated: Pass `true` to animate the presentation; otherwise, pass `false`. Default value is `true`.
     /// - Parameter completion: The block to execute after the presentation finishes. This block has no return value and takes no parameters.
     ///
-    public final func present(module: Module, with input: Value? = nil, animated: Bool = true, completion: (() -> Void)? = nil) -> Void {
+    public func present(module: Module, with input: Value? = nil, animated: Bool = true, completion: (() -> Void)? = nil) -> Void {
 
         let child = buildChildModuleIfNeeded(module)
-        if let input { child.receive(input) }
+        if let input { child.parentWillDisplay(with: input) }
         
         if !(self is Controllable), let child = child as? NavigationControllable {
             child.embedView()
@@ -102,47 +97,62 @@ open class PresentationRouter<Builder: Buildable>: DefaultRouter, ChildCancelabl
     
     // MARK: - Internal Methods
     
-    /// Hides and unloads the given router.
-    final func cancel(_ child: DefaultRouter, with result: Value?, _ unloaded: Bool, _ animated: Bool) -> Void {
-        
-        guard let module = children.key(byReference: child) else { return }
-        
+    final func hide(_ child: AnyObject, with output: Any?, _ animated: Bool, keep loaded: Bool) {
+        guard let child = child as? Routable,
+              let module = children.key(byReference: child)
+        else { return }
         if let transition = child.transition {
             switch transition {
             case .pushed: (view as? UINavigationController)?.popViewController(animated: animated)
             case .presented: child.view?.dismiss(animated: animated)
-            case .selected: return
+            case .permanent: return
             }
         }
+        if !loaded { detachChild(from: module) }
         
-        if unloaded { detachChild(from: module) }
-        childDidComplete(module, with: result)
+        guard let interactor = interactor as? ChildCompletable else { return }
+        interactor.childDidComplete(module, with: output)
+    }
+    
+    final func receiveFromChild(_ sender: Any, _ value: Any) -> Void {
+        guard let child = sender as? Routable,
+              let module = children.key(byReference: child),
+              let interactor = interactor as? Receivable
+        else { return }
+        interactor.receiveFromChild(module, value)
+    }
+    
+    final func passToChild(_ module: Any, _ value: Value) -> Void {
+        guard let module = module as? Module,
+              let child = children[module]
+        else { return }
+        child.receiveFromParent(value)
     }
     
     /// Attaches the given router to the module and activates it.
-    final func attach(_ child: DefaultRouter, to module: Module) -> Void {
+    final func attach(_ child: Routable, to module: Module) -> Void {
         children[module] = child
         child.parent = self
-        child.activate()
+        child.load()
     }
     
     /// Detaches the child router from the module and deactivates it.
     final func detachChild(from module: Module) -> Void {
         guard let child = children[module] else { return }
         children.removeValue(forKey: module)
-        child.deactivate()
+        child.unload()
     }
     
     /// Detaches all child routers and deactivates them.
     final func detachAllChildren() -> Void {
-        children.values.forEach { $0.deactivate() }
+        children.values.forEach { $0.unload() }
         children.removeAll()
     }
     
     /// Builds the given module if it's not been yet.
     /// - Returns: The router of this module.
     @discardableResult
-    final func buildChildModuleIfNeeded(_ module: Module) -> DefaultRouter {
+    final func buildChildModuleIfNeeded(_ module: Module) -> Routable {
         if let child = children[module] {
             return child
         } else {
@@ -155,9 +165,9 @@ open class PresentationRouter<Builder: Buildable>: DefaultRouter, ChildCancelabl
     }
     
     /// Called after the child module is built.
-    func didBuildChildModule(_ child: DefaultRouter) -> Void {}
+    func didBuildChildModule(_ child: Routable) -> Void {}
     
-    override func routerIsDeactivating() -> Void {
+    override func routerIsUnloading() -> Void {
         detachAllChildren()
     }
     
@@ -165,7 +175,7 @@ open class PresentationRouter<Builder: Buildable>: DefaultRouter, ChildCancelabl
     // MARK: - Init
     
     /// Creates a router with interactor and builder.
-    public init(interactor: RouterInteracting, builder: Builder) {
+    public init(interactor: Interacting, builder: Builder) {
         self.builder = builder
         super.init(interactor: interactor)
     }

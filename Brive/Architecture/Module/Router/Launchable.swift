@@ -1,20 +1,20 @@
 import UIKit
 
 /// A type that the root router should conform to.
-public protocol Launchable where Self: DefaultRouter {
+public protocol Launchable where Self: Routable {
     
-    /// Sets the router's view that will be shown.
-    func set(view: UIViewController?)-> Void
+    /// Sets the router's view to display.
+    func setView(_ view: UIViewController?)-> Void
     
     /// Launches the router from the given window.
-    func launch(from window: UIWindow) -> Void
+    func launch(from window: UIWindow?) -> Void
     
 }
 
 
 public extension Launchable {
     
-    func set(view: UIViewController?) -> Void {
+    func setView(_ view: UIViewController?) -> Void {
         if let self = self as? NavigationControllable {
             self.embedView()
         } else {
@@ -22,10 +22,11 @@ public extension Launchable {
         }
     }
     
-    func launch(from window: UIWindow) -> Void {
+    func launch(from window: UIWindow?) -> Void {
+        guard let window else { return }
         window.rootViewController = view
         window.makeKeyAndVisible()
-        activate()
+        load()
     }
     
 }
