@@ -14,4 +14,4 @@ protocol NavigationControllable: Controllable {
 
 
 /// A type that indicating that a router owns a navigation or a tab bar controller.
-protocol Controllable: AnyObject {}
+protocol Controllable where Self: Routable {}

@@ -8,12 +8,3 @@ public protocol InteractorToViewInterface: AnyObject {
     func hideLoading() -> Void
     
 }
-
-
-public extension InteractorToViewInterface {
-    
-    func showLoading() -> Void {}
-    
-    func hideLoading() -> Void {}
-    
-}

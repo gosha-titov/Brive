@@ -2,6 +2,6 @@ import UIKit
 
 //open class CompositeView<Module: Hashable>: View {
 //    
-//    public var components = [Module: UIViewController]()
+//    public var container = [Module: UIViewController]()
 //    
 //}

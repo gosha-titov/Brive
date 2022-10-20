@@ -1,7 +1,7 @@
 import UIKit
 
 /// a router whose view consists of other views.
-open class CompositeRouter<Builder: Buildable, Interacting: RouterToInteractorInterface>: PresentationRouter<Builder, Interacting> {
+open class CompositeRouter<Interacting: RouterToInteractorInterface, Builder: Buildable>: PresentationRouter<Interacting, Builder> {
     
     public var components = [Module]() {
         didSet { components.removeDuplicates() }
@@ -14,14 +14,13 @@ open class CompositeRouter<Builder: Buildable, Interacting: RouterToInteractorIn
     
     override func routerIsLoading() -> Void {
 //        guard let container = view as? CompositeView<Module> else { return }
-        if components.isEmpty { components = allChildModules }
-        for module in components {
-            let child = buildChildModuleIfNeeded(module)
+//        for module in components {
+//            let child = buildChildModuleIfNeeded(module)
 //            if let view = child.view {
 //                child.transition = .permanent
 //                container.components[module] = view
 //            }
-        }
+//        }
     }
     
     override func didBuildChildModule(_ child: Routable) {

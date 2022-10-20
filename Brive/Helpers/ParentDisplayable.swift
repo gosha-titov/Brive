@@ -1,12 +1,5 @@
 protocol ParentDisplayable: AnyObject {
     
-    func parentWillDisplay(with input: Any?) -> Void
-    
-}
-
-
-extension ParentDisplayable {
-    
-    func parentWillDisplay(with input: Any?) -> Void {}
+    func parentWillDisplayModule(with input: Any?) -> Void
     
 }

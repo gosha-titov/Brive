@@ -4,58 +4,34 @@ import UIKit
 /// A navigation router that owns child routers.
 ///
 /// The `NavigationRouter` class defines the shared behavior that’s common to all navigation routers.
-/// You rarely create instances of the `NavigationRouter` class directly.
-/// Instead, you subclass it and add the methods and properties needed to manage the module.
+/// You almost always subclass the `NavigationRouter` but you rarely implement it,
+/// since each router has already organized flow logic between modules.
+/// You usually do this as in the example below:
 ///
-/// The router's main responsibility is to load and unload the module. The implementation is hidden,
-/// but if you want to perform any additional work, override ``routerDidLoad()``
+///     final class SettingsRouter: NavigationRouter<SettingsInteractor, SettingsBuilder> {}
+///
+/// But if you need to, then subclass it and add the methods and properties to manage the router.
+///
+/// The router's lifecycle is loading and unloading. The implementation is hidden,
+/// but if you need to perform any additional work, override ``routerDidLoad()``
 /// and ``routerWillUnload()`` methods.
 ///
-/// The router can receive some data from its parent before being displayed.
-/// To handle this, override ``receive(_:)`` method.
-///
-/// In order to complete this module and show the parent one,
-/// call ``complete(with:unloaded:animated:)`` method.
-///
-/// You can communicate with a parent through your child-to-parent interface:
-///
-///     if let parent = parent as? YourChildToParentInterface {
-///         parent.doSomething()
-///     }
-///
-/// **The essence of a parent router is to own child modules and route to them.**
-/// Each child router is attached to its module.
+/// In order to complete this module and display the parent one,
+/// call ``complete(with:animateTransition:shouldKeepModuleLoaded:)`` method.
 ///
 /// The navigation router uses a navigation controller, that is, its view is embedded in the navigation interface.
+/// If you need to modify this interface, use `navigationController` property.
 ///
-/// Modules are built and activated when there is a transition to them.
-/// If you need to load some modules in advance, specify them as in the example:
+/// A navigation router can transite to child module in two ways:
+/// - use ``present(module:with:animated:completion:)`` method to present a child module modally,
+/// + use ``push(module:with:animated:)`` method to push a child module onto the navigation stack.
 ///
-///     router.activatedModulesInAdvance = [.feed, .messages]
-///
-/// You can handle result of a child module's completion by overriding the ``childDidComplete(_:with:)`` method.
-///
-/// You have two kind of transition to child modules:
-/// - use ``push(module:with:animated:)`` method to push a child module onto the navigation stack,
-/// + use ``present(module:with:animated:completion:)`` method to present a child module modally.
-///
-/// Or you can use ``route(to:with:)`` method of `Routing` protocol that calls the first method.
-///
-open class NavigationRouter<Builder: Buildable, Interacting: RouterToInteractorInterface>: PresentationRouter<Builder, Interacting>, NavigationControllable {
+open class NavigationRouter<Interacting: RouterToInteractorInterface, Builder: Buildable>: PresentationRouter<Interacting, Builder>, NavigationControllable {
     
     // MARK: - Properties
     
-    /// An array of child modules that will be activated in advance.
-    ///
-    /// Add сhild modules here if you want them to be activated when this module does.
-    /// These modules are not shown until it is needed.
-    /// The duplicate modules will be removed.
-    public final var activatedModulesInAdvance = [Module]() {
-        didSet { activatedModulesInAdvance.removeDuplicates() }
-    }
-    
     /// Returns a navigation controller used for this module.
-    public final var controller: UINavigationController? {
+    public final var navigationController: UINavigationController? {
         return view as? UINavigationController
     }
     
@@ -79,17 +55,17 @@ open class NavigationRouter<Builder: Buildable, Interacting: RouterToInteractorI
     ///
     public final func push(module: Module, with input: Value? = nil, animated: Bool = true) -> Void {
         
-        guard let controller else { return }
+        guard let navigationController else { return }
         
         let child = buildChildModuleIfNeeded(module)
-        if let input { child.parentWillDisplay(with: input) }
+        pass(input, to: child)
         
         if let view = child.view {
-            controller.pushViewController(view, animated: animated)
-            if child is NavigationControllable { child.view = controller }
+            navigationController.pushViewController(view, animated: animated)
+            if child is NavigationControllable { child.view = navigationController }
             child.transition = .pushed
         } else {
-            child.view = controller
+            child.view = navigationController
         }
         
     }
@@ -105,10 +81,6 @@ open class NavigationRouter<Builder: Buildable, Interacting: RouterToInteractorI
             transition = .pushed
         }
         view = controller
-    }
-    
-    override func routerIsLoading() {
-        activatedModulesInAdvance.forEach { buildChildModuleIfNeeded($0) }
     }
     
 }

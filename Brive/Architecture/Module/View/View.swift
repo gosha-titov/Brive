@@ -29,29 +29,34 @@ open class View<Interacting: ViewToInteractorInterface>: UIViewController, Viewa
         return label
     }()
     
+    public lazy var activityContainer: UIView = {
+        let view = UIView(frame: view.frame)
+        view.addSubviews(activityIndicator, activityLabel)
+        view.backgroundColor = .black
+        return view
+    }()
+    
     
     // MARK: - Open Methods
     
     /// Shows loading.
     ///
-    /// Adds the activity indicator and label to subviews.
+    /// Adds the activity container to subviews.
     /// Override this method to perform additional work.
     /// You need to call the `super` method.
     open func showLoading() -> Void {
-        view.addSubview(activityIndicator)
-        view.addSubview(activityLabel)
+        view.addSubview(activityContainer)
         activityIndicator.startAnimating()
     }
     
     /// Hides loading.
     ///
-    /// Removes the activity indicator and label from subviews.
+    /// Removes the activity container from subviews.
     /// Override this method to perform additional work.
     /// You need to call the `super` method.
     open func hideLoading() -> Void {
         activityIndicator.stopAnimating()
-        activityIndicator.removeFromSuperview()
-        activityLabel.removeFromSuperview()
+        activityContainer.removeFromSuperview()
     }
     
 }

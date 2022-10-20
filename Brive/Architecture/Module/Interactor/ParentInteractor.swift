@@ -4,25 +4,25 @@
 /// You rarely create instances of the `ParentInteractor` class directly.
 /// Instead, you subclass it and add the methods and properties needed to manage the business logic of this module.
 ///
-/// If this module should have an associated `View`, then use `ViewOwnable` protocol.
+/// If this module should have an associated `View`, then use the `ViewOwnable` protocol.
 ///
-/// The interactor's main responsibility is to be activated and deactivated. The implementation is hidden,
-/// but if you want to perform any additional work, override ``interactorDidActivate()``
+/// The interactor's lifecycle consists of activation and deactivation. The implementation is hidden,
+/// but if you need to perform any additional work, override ``interactorDidActivate()``
 /// and ``interactorWillDeactivate()`` methods.
 ///
-/// The parent module can pass some data to this module before displaying it.
+/// When a parent interactor is about to display this module, it can pass some input data.
 /// To handle this, override ``parent(willDisplayModuleWith:)`` method.
 ///
-/// The parent module can pass some data to this module while it's activated.
+/// The parent interactor can pass some data to this interactor while it's activated.
 /// To handle this, override ``parent(didPass:)`` method.
 ///
-/// The child module can be completed with some output.
+/// When a child module completes, it can pass some output data.
 /// To handle this, override ``child(_:didCompleteWith:)`` method.
 ///
-/// The child module can pass some data to this module while it's activated.
+/// The child interactor can pass some data to this interactor while it's activated.
 /// To handle this, override ``child(_:didPass:)`` method.
 ///
-/// In order to pass data to the parent or child module, call ``pass(_:to:)`` method.
+/// In order to pass some data to the parent module, call ``pass(_:to:)`` method.
 ///
 open class ParentInteractor<Routing: InteractorToRouterInterface, Module: Hashable>: DefaultInteractor<Routing> {
     
@@ -59,14 +59,21 @@ open class ParentInteractor<Routing: InteractorToRouterInterface, Module: Hashab
         passToChild(module, value)
     }
     
-    
-    // MARK: - Internal Methods
+}
+
+
+extension ParentInteractor: ChildCompletable {
     
     /// Called when the child module is completed.
     final func childDidComplete(_ module: Any, with output: Any?) -> Void {
         guard let module = module as? Module else { return }
         child(module, didCompleteWith: output)
     }
+    
+}
+
+
+extension ParentInteractor: ChildCommunicable {
     
     /// Called when the child module passes a value.
     final func receiveFromChild(_ sender: Any, _ value: Any) -> Void {
@@ -76,7 +83,7 @@ open class ParentInteractor<Routing: InteractorToRouterInterface, Module: Hashab
     
     /// Passes some value to a child module.
     final func passToChild(_ module: Any, _ value: Any) -> Void {
-        guard let router = router as? Passable else { return }
+        guard let router = router as? ChildCommunicable else { return }
         router.passToChild(module, value)
     }
     

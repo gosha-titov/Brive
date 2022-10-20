@@ -3,42 +3,31 @@ import UIKit
 
 /// A presentation router that owns child routers.
 ///
-/// The `PresentationRouter` class defines the shared behavior that’s common to parent routers.
-/// You rarely create instances of the `PresentationRouter` class directly.
-/// Instead, you subclass it and add the methods and properties needed to manage the module.
+/// The `PresentationRouter` class defines the shared behavior that’s common to all parent routers.
+/// You almost always subclass the `PresentationRouter` but you rarely implement it,
+/// since each router has already organized flow logic between modules.
+/// You usually do this as in the example below:
 ///
-/// The router's main responsibility is to load and unload the module. The implementation is hidden,
-/// but if you want to perform any additional work, override ``routerDidLoad()``
+///     final class SettingsRouter: PresentationRouter<SettingsInteractor, SettingsBuilder> {}
+///
+/// But if you need to, then subclass it and add the methods and properties to manage the router.
+///
+/// The router's lifecycle is loading and unloading. The implementation is hidden,
+/// but if you need to perform any additional work, override ``routerDidLoad()``
 /// and ``routerWillUnload()`` methods.
 ///
-/// The router can receive some data from its parent before being displayed.
-/// To handle this, override ``receive(_:)`` method.
+/// In order to complete this module and display the parent one,
+/// call ``complete(with:animateTransition:shouldKeepModuleLoaded:)`` method.
 ///
-/// In order to complete this module and show the parent one,
-/// call ``complete(with:unloaded:animated:)`` method.
+/// A feature of a presentation router is to present a child module modally.
+/// To do this, call ``present(module:with:animated:completion:)`` method.
 ///
-/// You can communicate with a parent through your child-to-parent interface:
-///
-///     if let parent = parent as? YourChildToParentInterface {
-///         parent.doSomething()
-///     }
-///
-/// **The essence of a parent router is to own child modules and route to them.**
-/// Each child router is attached to its module.
-///
-/// You can handle result of a child module's completion by overriding the ``childDidComplete(_:with:)`` method.
-///
-/// Use ``present(module:with:animated:completion:)`` method to present a child module modally.
-/// The ``route(to:with:)`` method of `Routing` protocol that does the same thing.
-///
-open class PresentationRouter<Builder: Buildable, Interacting: RouterToInteractorInterface>: DefaultRouter<Interacting>, Routing {
+open class PresentationRouter<Interacting: RouterToInteractorInterface, Builder: Buildable>: DefaultRouter<Interacting>, Routing {
     
     /// Child modules of this module.
     public typealias Module = Builder.Module
     
     // MARK: - Internal Properties
-    
-    var allChildModules = Module.allCases.map{$0}
     
     /// The dictionary of routers that are children of the current router.
     var children = [Module: Routable]()
@@ -79,7 +68,7 @@ open class PresentationRouter<Builder: Buildable, Interacting: RouterToInteracto
     public func present(module: Module, with input: Value? = nil, animated: Bool = true, completion: (() -> Void)? = nil) -> Void {
 
         let child = buildChildModuleIfNeeded(module)
-        if let input { child.parentWillDisplay(with: input) }
+        pass(input, to: child)
         
         if !(self is Controllable), let child = child as? NavigationControllable {
             child.embedView()
@@ -97,36 +86,9 @@ open class PresentationRouter<Builder: Buildable, Interacting: RouterToInteracto
     
     // MARK: - Internal Methods
     
-    final func hide(_ child: AnyObject, with output: Any?, _ animated: Bool, keep loaded: Bool) {
-        guard let child = child as? Routable,
-              let module = children.key(byReference: child)
-        else { return }
-        if let transition = child.transition {
-            switch transition {
-            case .pushed: (view as? UINavigationController)?.popViewController(animated: animated)
-            case .presented: child.view?.dismiss(animated: animated)
-            case .permanent: return
-            }
-        }
-        if !loaded { detachChild(from: module) }
-        
-        guard let interactor = interactor as? ChildCompletable else { return }
-        interactor.childDidComplete(module, with: output)
-    }
-    
-    final func receiveFromChild(_ sender: Any, _ value: Any) -> Void {
-        guard let child = sender as? Routable,
-              let module = children.key(byReference: child),
-              let interactor = interactor as? Receivable
-        else { return }
-        interactor.receiveFromChild(module, value)
-    }
-    
-    final func passToChild(_ module: Any, _ value: Value) -> Void {
-        guard let module = module as? Module,
-              let child = children[module]
-        else { return }
-        child.receiveFromParent(value)
+    final func pass(_ input: Value?, to child: Routable) -> Void {
+        guard let child = child as? ParentDisplayable else { return }
+        child.parentWillDisplayModule(with: input)
     }
     
     /// Attaches the given router to the module and activates it.
@@ -178,6 +140,51 @@ open class PresentationRouter<Builder: Buildable, Interacting: RouterToInteracto
     public init(interactor: Interacting, builder: Builder) {
         self.builder = builder
         super.init(interactor: interactor)
+    }
+    
+}
+
+
+extension PresentationRouter: ChildHideable {
+    
+    /// Hides the child module.
+    final func hide(_ child: AnyObject, with output: Any?, animateTransition animated: Bool, shouldKeepLoaded loaded: Bool) {
+        guard let child = child as? Routable,
+              let module = children.key(byReference: child)
+        else { return }
+        if let transition = child.transition {
+            switch transition {
+            case .pushed: (view as? UINavigationController)?.popViewController(animated: animated)
+            case .presented: child.view?.dismiss(animated: animated)
+            case .permanent: return
+            }
+        }
+        if !loaded { detachChild(from: module) }
+        
+        guard let interactor = interactor as? ChildCompletable else { return }
+        interactor.childDidComplete(module, with: output)
+    }
+    
+}
+
+
+extension PresentationRouter: ChildCommunicable {
+    
+    /// Called when the child module passes a value.
+    final func receiveFromChild(_ sender: Any, _ value: Any) -> Void {
+        guard let child = sender as? Routable,
+              let module = children.key(byReference: child),
+              let interactor = interactor as? ChildCommunicable
+        else { return }
+        interactor.receiveFromChild(module, value)
+    }
+    
+    /// Passes some value to a child module.
+    final func passToChild(_ module: Any, _ value: Value) -> Void {
+        guard let module = module as? Module,
+              let child = children[module] as? ParentCommunicable
+        else { return }
+        child.receiveFromParent(value)
     }
     
 }

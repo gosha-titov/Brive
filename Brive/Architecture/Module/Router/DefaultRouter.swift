@@ -3,18 +3,20 @@ import UIKit
 /// A default router that doesn't own child routers.
 ///
 /// The `DefaultRouter` class defines the shared behavior that’s common to all routers.
-/// You rarely create instances of the `DefaultRouter` class directly.
-/// Instead, you subclass it and add the methods and properties needed to manage the module.
+/// You almost always subclass the `DefaultRouter` but you rarely implement it,
+/// since each router has already organized flow logic between modules.
+/// You usually do this as in the example below:
 ///
-/// The router's main responsibility is to load and unload the module. The implementation is hidden,
-/// but if you want to perform any additional work, override ``routerDidLoad()``
+///     final class SettingsRouter: DefaultRouter<SettingsInteractor> {}
+///
+/// But if you need to, then subclass it and add the methods and properties to manage the router.
+///
+/// The router's lifecycle is loading and unloading. The implementation is hidden,
+/// but if you need to perform any additional work, override ``routerDidLoad()``
 /// and ``routerWillUnload()`` methods.
 ///
-/// The router can receive some data from its parent before being displayed.
-/// To handle this, override ``receive(_:)`` method.
-///
-/// In order to complete this module and show the parent one,
-/// call ``complete(with:unloaded:animated:)`` method.
+/// In order to complete this module and display the parent one,
+/// call ``complete(with:animateTransition:shouldKeepModuleLoaded:)`` method.
 /// 
 open class DefaultRouter<Interacting: RouterToInteractorInterface>: Routable {
     
@@ -52,35 +54,17 @@ open class DefaultRouter<Interacting: RouterToInteractorInterface>: Routable {
     /// - The router doesn't have a parent,
     /// + The router is a tab of the parent tab bar router.
     ///
-    /// - Parameter result: You can pass some data to the parent router. Default value is `nil`.
-    /// - Parameter loaded: Pass `true` to keep this module loaded while the parent is loaded; otherwise, pass `false`. Default value is `true`.
+    /// - Parameter output: You can pass some data to the parent router. Default value is `nil`.
     /// - Parameter animated: Pass `true` to animate the transition; otherwise, pass `false`. Default value is `true`.
+    /// - Parameter loaded: Pass `true` to keep this module loaded while the parent is loaded; otherwise, pass `false`. Default value is `false`.
     ///
-    public final func complete(with result: Value? = nil, loaded: Bool = true, animated: Bool = true) -> Void {
+    public final func complete(with output: Value? = nil, animateTransition animated: Bool = true, shouldKeepModuleLoaded loaded: Bool = false) -> Void {
         guard let parent = parent as? ChildHideable else { return }
-        parent.hide(self, with: result, animated, keep: loaded)
+        parent.hide(self, with: output, animateTransition: animated, shouldKeepLoaded: loaded)
     }
     
     
     // MARK: - Internal Methods
-    
-    /// Called before the parent module displayes this module.
-    final func parentWillDisplay(with input: Value?) -> Void {
-        guard let interactor = interactor as? ParentDisplayable else { return }
-        interactor.parentWillDisplay(with: input)
-    }
-    
-    /// Called when the parent module passes some value.
-    final func receiveFromParent(_ value: Value) -> Void {
-        guard let interactor = interactor as? Receivable else { return }
-        interactor.receiveFromParent(value)
-    }
-    
-    /// Passes some value to a parent interactor.
-    final func passToParent(_ value: Value) -> Void {
-        guard let parent else { return }
-        parent.receiveFromChild(self, value)
-    }
     
     /// Called when the router is loading.
     func routerIsLoading() -> Void {}
@@ -115,5 +99,33 @@ open class DefaultRouter<Interacting: RouterToInteractorInterface>: Routable {
     }
     
     deinit { unload() }
+    
+}
+
+
+extension DefaultRouter: ParentDisplayable {
+    
+    /// Called before the parent module displayes this module.
+    final func parentWillDisplayModule(with input: Value?) -> Void {
+        guard let interactor = interactor as? ParentDisplayable else { return }
+        interactor.parentWillDisplayModule(with: input)
+    }
+    
+}
+
+
+extension DefaultRouter: ParentCommunicable {
+    
+    /// Called when the parent module passes some value.
+    final func receiveFromParent(_ value: Value) -> Void {
+        guard let interactor = interactor as? ParentCommunicable else { return }
+        interactor.receiveFromParent(value)
+    }
+    
+    /// Passes some value to a parent interactor.
+    final func passToParent(_ value: Value) -> Void {
+        guard let parent = parent as? ChildCommunicable else { return }
+        parent.receiveFromChild(self, value)
+    }
     
 }

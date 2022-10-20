@@ -1,6 +1,6 @@
 import UIKit
 
-open class Routable: Passable, Receivable, ParentDisplayable {
+open class Routable {
     
     /// A transition that is performed to the child module.
     enum Transition { case presented, pushed, permanent }

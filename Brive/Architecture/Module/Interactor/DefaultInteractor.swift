@@ -4,21 +4,21 @@
 /// You rarely create instances of the `DefaultInteractor` class directly.
 /// Instead, you subclass it and add the methods and properties needed to manage the business logic of this module.
 ///
-/// If this module should have an associated `View`, then use `ViewOwnable` protocol.
+/// If this module should have an associated `View`, then use the `ViewOwnable` protocol.
 ///
-/// The interactor's main responsibility is to be activated and deactivated. The implementation is hidden,
-/// but if you want to perform any additional work, override ``interactorDidActivate()``
+/// The interactor's lifecycle consists of activation and deactivation. The implementation is hidden,
+/// but if you need to perform any additional work, override ``interactorDidActivate()``
 /// and ``interactorWillDeactivate()`` methods.
 ///
-/// The parent module can pass some data to this module before displaying it.
-/// To handle this, override ``parent(willDisplayWith:)`` method.
+/// When a parent interactor is about to display this module, it can pass some input data.
+/// To handle this, override ``parent(willDisplayModuleWith:)`` method.
 ///
-/// The parent module can pass some data to this module while it's activated.
+/// The parent interactor can pass some data to this interactor while it's activated.
 /// To handle this, override ``parent(didPass:)`` method.
 ///
-/// In order to pass data to the parent module, call ``pass(_:to:)`` method.
+/// In order to pass some data to the parent module, call ``pass(_:to:)`` method.
 ///
-open class DefaultInteractor<Routing: InteractorToRouterInterface>: Interactable {
+open class DefaultInteractor<Routing: InteractorToRouterInterface> {
     
     /// A receiver that is a parent interactor.
     public enum ParentReceiver { case parent }
@@ -39,7 +39,7 @@ open class DefaultInteractor<Routing: InteractorToRouterInterface>: Interactable
     /// Override this method to perform additional work and/or to handle the input.
     /// If the result was not passed, then the value is `nil`.
     /// You don't need to call the `super` method.
-    open func parent(willDisplayWith input: Value?) -> Void {}
+    open func parent(willDisplayModuleWith input: Value?) -> Void {}
     
     /// Called when the parent module passes a value.
     ///
@@ -67,13 +67,20 @@ open class DefaultInteractor<Routing: InteractorToRouterInterface>: Interactable
         passToParent(value)
     }
     
-    
-    // MARK: - Internal Methods
+}
+
+
+extension DefaultInteractor: ParentDisplayable {
     
     /// Called before the parent module displayes this module.
-    final func parentWillDisplay(with input: Any?) -> Void {
-        parent(willDisplayWith: input)
+    final func parentWillDisplayModule(with input: Any?) -> Void {
+        parent(willDisplayModuleWith: input)
     }
+    
+}
+
+
+extension DefaultInteractor: ParentCommunicable {
     
     /// Called when the parent module passes some value.
     final func receiveFromParent(_ value: Any) -> Void {
@@ -82,9 +89,14 @@ open class DefaultInteractor<Routing: InteractorToRouterInterface>: Interactable
     
     /// Passes some value to a parent interactor.
     final func passToParent(_ value: Any) -> Void {
-        guard let router = router as? Passable else { return }
+        guard let router = router as? ParentCommunicable else { return }
         router.passToParent(value)
     }
+    
+}
+
+
+extension DefaultInteractor: Eventable {
     
     /// Activates this interactor.
     final func activate() -> Void {

@@ -3,51 +3,41 @@ import UIKit
 
 /// A tab bar router that owns child routers.
 ///
-/// The `TabBarRouter` class defines the shared behavior that’s common to all tab bar routers.
-/// You rarely create instances of the `TabBarRouter` class directly.
-/// Instead, you subclass it and add the methods and properties needed to manage the module.
+/// The `TabBarRouter` class defines the shared behavior that’s common to all navigation routers.
+/// You almost always subclass the `TabBarRouter` but you rarely implement it,
+/// since each router has already organized flow logic between modules.
+/// You usually do this as in the example below:
 ///
-/// The router's main responsibility is to load and unload the module. The implementation is hidden,
-/// but if you want to perform any additional work, override ``routerDidLoad()``
+///     final class MainTabBarRouter: TabBarRouter<MainInteractor, MainBuilder> {}
+///
+/// But if you need to, then subclass it and add the methods and properties to manage the router.
+///
+/// The router's lifecycle is loading and unloading. The implementation is hidden,
+/// but if you need to perform any additional work, override ``routerDidLoad()``
 /// and ``routerWillUnload()`` methods.
 ///
-/// The router can receive some data from its parent before being displayed.
-/// To handle this, override ``receive(_:)`` method.
-///
-/// In order to complete this module and show the parent one,
-/// call ``complete(with:unloaded:animated:)`` method.
-///
-/// You can communicate with a parent through your child-to-parent interface:
-///
-///     if let parent = parent as? YourChildToParentInterface {
-///         parent.doSomething()
-///     }
-///
-/// **The essence of a parent router is to own child modules and route to them.**
-/// Each child router is attached to its module.
+/// In order to complete this module and display the parent one,
+/// call ``complete(with:animateTransition:shouldKeepModuleLoaded:)`` method.
 ///
 /// The tab bar router uses a tab bar controller that manages a multiselection interface,
 /// where the selection determines which child view controller to display.
+/// If you need to modify this interface, use `tabBarController` property.
 ///
-/// You need to set tab bar modules before this module is activated, do it as in the example:
+/// You need to set tab bar modules before this module is loaded, do it as in the example below:
 ///
 ///     router.tabBar = [.feed, .messages, .settings]
 ///
-/// You can handle result of a child module's completion by overriding the ``childDidComplete(_:with:)`` method.
+/// A tab bar router can transite to child module in two ways:
+/// - use ``present(module:with:animated:completion:)`` method to present a child module modally,
+/// + use ``select(module:with:)`` method to switch to a child module.
 ///
-/// You have two kind of transition to child modules:
-/// - use ``select(module:with:)`` method to switch to the module, but it doesn't work with unspecified modules,
-/// + use ``present(module:with:animated:completion:)`` method to present a child module modally.
-///
-/// Or you can use ``route(to:with:)`` method of `Routing` protocol that calls the first method.
-///
-open class TabBarRouter<Builder: Buildable, Interacting: RouterToInteractorInterface>: PresentationRouter<Builder, Interacting>, TabBarControllable {
+open class TabBarRouter<Interacting: RouterToInteractorInterface, Builder: Buildable>: PresentationRouter<Interacting, Builder>, TabBarControllable {
      
     // MARK: - Properties
     
     /// The tab bar modules.
     ///
-    /// Before activation, you need to set all child modules in the order in which they should be displayed.
+    /// Before loading, you need to set all child modules in the order in which they should be displayed.
     ///
     ///     someRouter.tabBar = [.feed, .messages, .settings]
     ///
@@ -57,7 +47,7 @@ open class TabBarRouter<Builder: Buildable, Interacting: RouterToInteractorInter
     }
     
     /// Returns a tab bar controller used for this module.
-    public final var controller: UITabBarController? {
+    public final var tabBarController: UITabBarController? {
         return view as? UITabBarController
     }
     
@@ -73,16 +63,15 @@ open class TabBarRouter<Builder: Buildable, Interacting: RouterToInteractorInter
     
     /// Switches to the given module.
     ///
-    /// - Parameters:
-    ///     - module: A child module that will be shown.
-    ///     - input: Some value that you want to pass to this module before it is shown.
+    /// - Parameter module: A child module that will be displayed.
+    /// - Parameter input: Some value that you want to pass to this module before it is displayed.
     ///
     public final func select(module: Module, with input: Value? = nil) -> Void {
-        guard let index = tabBar.firstIndex(of: module), let controller else { return }
+        guard let index = tabBar.firstIndex(of: module), let tabBarController else { return }
         if let child = children[module] {
-            if let input { child.parentWillDisplay(with: input) }
+            pass(input, to: child)
         }
-        controller.selectedIndex = index
+        tabBarController.selectedIndex = index
     }
     
     
@@ -92,7 +81,6 @@ open class TabBarRouter<Builder: Buildable, Interacting: RouterToInteractorInter
         let controller = UITabBarController()
         view = controller
         var views = [UIViewController]()
-        if tabBar.isEmpty { tabBar = allChildModules }
         for module in tabBar {
             let child = buildChildModuleIfNeeded(module)
             if let view = child.view {
