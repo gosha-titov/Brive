@@ -17,10 +17,16 @@ open class Routable {
     var transition: Transition?
     
     
-    // MARK: - Methods
+    // MARK: - Lifecycle
     
     /// Loads this router and therefore its module.
     func load() -> Void {}
+    
+    /// Suspends this router and therefore its module.
+    func suspend() -> Void {}
+    
+    /// Resumes this router and therefore its module.
+    func resume() -> Void {}
     
     /// Unloads this router and therefore its module.
     func unload() -> Void {}

@@ -16,7 +16,7 @@ import UIKit
 /// and ``routerWillUnload()`` methods.
 ///
 /// In order to complete this module and display the parent one,
-/// call ``complete(with:animateTransition:shouldKeepModuleLoaded:)`` method.
+/// call ``complete(with:animated:shouldKeepModuleLoaded:)`` method.
 /// 
 open class DefaultRouter<Interacting: RouterToInteractorInterface>: Routable {
     
@@ -58,7 +58,7 @@ open class DefaultRouter<Interacting: RouterToInteractorInterface>: Routable {
     /// - Parameter animated: Pass `true` to animate the transition; otherwise, pass `false`. Default value is `true`.
     /// - Parameter loaded: Pass `true` to keep this module loaded while the parent is loaded; otherwise, pass `false`. Default value is `false`.
     ///
-    public final func complete(with output: Value? = nil, animateTransition animated: Bool = true, shouldKeepModuleLoaded loaded: Bool = false) -> Void {
+    public final func complete(with output: Value? = nil, animated: Bool = true, shouldKeepModuleLoaded loaded: Bool = false) -> Void {
         guard let parent = parent as? ChildHideable else { return }
         parent.hide(self, with: output, animateTransition: animated, shouldKeepLoaded: loaded)
     }
@@ -78,6 +78,16 @@ open class DefaultRouter<Interacting: RouterToInteractorInterface>: Routable {
         routerIsLoading()
         routerDidLoad()
         interactor.activate()
+    }
+    
+    final override func suspend() -> Void {
+        guard let interactor = interactor as? Eventable else { return }
+        interactor.suspend()
+    }
+    
+    final override func resume() -> Void {
+        guard let interactor = interactor as? Eventable else { return }
+        interactor.resume()
     }
     
     /// Unloads this router and therefore its module.

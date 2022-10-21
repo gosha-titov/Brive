@@ -4,11 +4,15 @@
 /// You rarely create instances of the `DefaultInteractor` class directly.
 /// Instead, you subclass it and add the methods and properties needed to manage the business logic of this module.
 ///
-/// If this module should have an associated `View`, then use the `ViewOwnable` protocol.
+/// If this module should have an associated `View`, then use the ``ViewOwnable`` protocol.
 ///
-/// The interactor's lifecycle consists of activation and deactivation. The implementation is hidden,
-/// but if you need to perform any additional work, override ``interactorDidActivate()``
-/// and ``interactorWillDeactivate()`` methods.
+/// The interactor's lifecycle consists of activation and deactivation, but in the interval between them,
+/// there may also be suspending and resuming. The implementation is hidden, but if you need to perform any additional work,
+/// override ``interactorDidActivate()``, ``interactorDidSuspend()``, ``interactorWillResume()``
+/// and/or ``interactorWillDeactivate()`` methods.
+///
+/// The ``state`` property is indicating the current state of the interactor.
+/// There're three possible states: `active`, `suspended` or `inactive`.
 ///
 /// When a parent interactor is about to display this module, it can pass some input data.
 /// To handle this, override ``parent(willDisplayModuleWith:)`` method.
@@ -20,7 +24,10 @@
 ///
 open class DefaultInteractor<Routing: InteractorToRouterInterface> {
     
-    /// A receiver that is a parent interactor.
+    /// A type that representing a lifecycle of the interactor.
+    public enum Lifecycle { case active, suspended, inactive }
+    
+    /// A type that associating with a parent interactor.
     public enum ParentReceiver { case parent }
     
     /// Some data that is passed between parent and child modules.
@@ -28,9 +35,11 @@ open class DefaultInteractor<Routing: InteractorToRouterInterface> {
     
     // MARK: - Properties
     
+    /// A Lifecycle value that indicating the current state of the interactor.
+    public private(set) var state: Lifecycle = .inactive
+    
     /// The router that is responsible for navigation between screens.
     public weak var router: Routing?
-    
     
     // MARK: - Open Methods
     
@@ -47,13 +56,28 @@ open class DefaultInteractor<Routing: InteractorToRouterInterface> {
     /// You don't need to call the `super` method.
     open func parent(didPass value: Value) -> Void {}
     
-    /// Called after this interactor is activated.
+    
+    // MARK: Lifecycle
+    
+    /// Called after the interactor is activated.
     ///
     /// Override this method to perform additional work.
     /// You don't need to call the `super` method.
     open func interactorDidActivate() -> Void {}
     
-    /// Called when this interactor is about to be deactivated.
+    /// Called after the interactor is suspended.
+    ///
+    /// Override this method to perform additional work.
+    /// You don't need to call the `super` method.
+    open func interactorDidSuspend() -> Void {}
+    
+    /// Called when the interactor is about to be resumed.
+    ///
+    /// Override this method to perform additional work.
+    /// You don't need to call the `super` method.
+    open func interactorWillResume() -> Void {}
+    
+    /// Called when the interactor is about to be deactivated.
     ///
     /// Override this method to perform additional work.
     /// You don't need to call the `super` method.
@@ -100,12 +124,26 @@ extension DefaultInteractor: Eventable {
     
     /// Activates this interactor.
     final func activate() -> Void {
+        state = .active
         interactorDidActivate()
+    }
+    
+    /// Suspends this interactor.
+    final func suspend() -> Void {
+        state = .suspended
+        interactorDidSuspend()
+    }
+    
+    /// Resumes this interactor.
+    final func resume() -> Void {
+        interactorWillResume()
+        state = .active
     }
     
     /// Deactivates this interactor.
     final func deactivate() -> Void {
         interactorWillDeactivate()
+        state = .inactive
         router = nil
     }
     

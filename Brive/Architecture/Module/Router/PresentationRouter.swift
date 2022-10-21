@@ -116,6 +116,7 @@ open class PresentationRouter<Interacting: RouterToInteractorInterface, Builder:
     @discardableResult
     final func buildChildModuleIfNeeded(_ module: Module) -> Routable {
         if let child = children[module] {
+            child.resume()
             return child
         } else {
             let (child, view) = builder.build(module)
@@ -148,7 +149,7 @@ open class PresentationRouter<Interacting: RouterToInteractorInterface, Builder:
 extension PresentationRouter: ChildHideable {
     
     /// Hides the child module.
-    final func hide(_ child: AnyObject, with output: Any?, animateTransition animated: Bool, shouldKeepLoaded loaded: Bool) {
+    final func hide(_ child: AnyObject, with output: Any?, animateTransition animated: Bool, shouldKeepLoaded: Bool) {
         guard let child = child as? Routable,
               let module = children.key(byReference: child)
         else { return }
@@ -159,7 +160,7 @@ extension PresentationRouter: ChildHideable {
             case .permanent: return
             }
         }
-        if !loaded { detachChild(from: module) }
+        if shouldKeepLoaded { child.suspend() } else { detachChild(from: module) }
         
         guard let interactor = interactor as? ChildCompletable else { return }
         interactor.childDidComplete(module, with: output)

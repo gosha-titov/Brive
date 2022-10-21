@@ -24,9 +24,9 @@
 ///
 /// In order to pass some data to the parent module, call ``pass(_:to:)`` method.
 ///
-open class ParentInteractor<Routing: InteractorToRouterInterface, Module: Hashable>: DefaultInteractor<Routing> {
+open class ParentInteractor<Routing: InteractorToRouterInterface, Module>: DefaultInteractor<Routing> {
     
-    /// A receiver that is a child interactor.
+    /// A type that associating with a child interactor.
     public enum ChildReceiver {
         case child(Module)
         var module: Module {
