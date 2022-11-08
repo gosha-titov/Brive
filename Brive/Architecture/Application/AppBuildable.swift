@@ -2,44 +2,83 @@ import UIKit
 
 /// A type that can build a root module.
 ///
-/// A builder that conforms to `AppBuildable` protocol can build a root module.
-/// To do this, you must implement `buildRootModule()` method that returns a root router.
-/// This router should conform to `Launchable` to be launched from a window.
+/// A builder that conforms to the `MainBuildable` protocol can build a root module.
 ///
-/// Unlike other builders, you call `buildRootModule()` method directly.
-/// You usually do this inside `SceneDelegate`.
+/// The `buildRootModule()` method shoud be implemented in one of the following ways:
 ///
-/// Implementation of `buildRootModule()` method shoud be as in the example below:
-///
-///     func buildRootModule() -> RootRouter {
+///     // Returns a default module
+///     func buildRootModule() -> RootModule {
+///         let router = RootRouter()
+///         let interactor = RootInteractor()
 ///         let view = RootView()
-///         let interactor = RootInteractor(view: view)
-///         let router = RootRouter(interactor: interactor)
-///         view.interactor = interactor
-///         interactor.router = router
-///         router.setView(view)
-///         return router
+///         return DefaultModule(router: router, interactor: interactor, view: view)
 ///     }
 ///
-public protocol AppBuildable: AnyObject {
+///     // Returns a non-viewing default module
+///     func buildRootModule() -> RootModule {
+///         let router = RootRouter()
+///         let interactor = RootInteractor()
+///         return DefaultModule(router: router, interactor: interactor)
+///     }
+///
+///     // Returns a parent module
+///     func buildRootModule() -> RootModule {
+///         let builder = RootBuilder()
+///         let router = RootRouter()
+///         let interactor = RootInteractor()
+///         let view = RootView()
+///         return ParentModule(builder: builder, router: router, interactor: interactor, view: view)
+///     }
+///
+///     // Returns a non-viewing parent module
+///     func buildRootModule() -> RootModule {
+///         let builder = RootBuilder()
+///         let router = RootRouter()
+///         let interactor = RootInteractor()
+///         return ParentModule(builder: builder, router: router, interactor: interactor)
+///     }
+///
+public protocol MainBuildable: AnyObject {
     
-    /// The root router of this module that can be launched from a window.
-    associatedtype RootRouter: Launchable
+    /// A child root module.
+    associatedtype RootModule: DefaultModule
     
     /// Builds the root module.
     ///
-    /// Implementation of this method shoud be as in the example below:
+    /// This method shoud be implemented in one of the following ways:
     ///
-    ///     func buildRootModule() -> RootRouter {
+    ///     // Returns a default module
+    ///     func buildRootModule() -> RootModule {
+    ///         let router = RootRouter()
+    ///         let interactor = RootInteractor()
     ///         let view = RootView()
-    ///         let interactor = RootInteractor(view: view)
-    ///         let router = RootRouter(interactor: interactor)
-    ///         view.interactor = interactor
-    ///         interactor.router = router
-    ///         router.setView(view)
-    ///         return router
+    ///         return DefaultModule(router: router, interactor: interactor, view: view)
     ///     }
     ///
-    func buildRootModule() -> RootRouter
+    ///     // Returns a non-viewing default module
+    ///     func buildRootModule() -> RootModule {
+    ///         let router = RootRouter()
+    ///         let interactor = RootInteractor()
+    ///         return DefaultModule(router: router, interactor: interactor)
+    ///     }
+    ///
+    ///     // Returns a parent module
+    ///     func buildRootModule() -> RootModule {
+    ///         let builder = RootBuilder()
+    ///         let router = RootRouter()
+    ///         let interactor = RootInteractor()
+    ///         let view = RootView()
+    ///         return ParentModule(builder: builder, router: router, interactor: interactor, view: view)
+    ///     }
+    ///
+    ///     // Returns a non-viewing parent module
+    ///     func buildRootModule() -> RootModule {
+    ///         let builder = RootBuilder()
+    ///         let router = RootRouter()
+    ///         let interactor = RootInteractor()
+    ///         return ParentModule(builder: builder, router: router, interactor: interactor)
+    ///     }
+    ///
+    func buildRootModule() -> RootModule
     
 }

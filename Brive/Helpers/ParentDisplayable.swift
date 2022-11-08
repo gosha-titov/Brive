@@ -1,5 +1,5 @@
 protocol ParentDisplayable: AnyObject {
     
-    func parentWillDisplayModule(with input: Any?) -> Void
+    func parentWillDisplayModule(ByPassing input: Any?) -> Void
     
 }
